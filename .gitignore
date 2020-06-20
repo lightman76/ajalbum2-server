@@ -35,3 +35,4 @@
 yarn-debug.log*
 .yarn-integrity
 /.idea/
+/config/server_specific_config.yml

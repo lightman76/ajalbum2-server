@@ -33,7 +33,8 @@ ActiveRecord::Schema.define(version: 2020_06_14_041449) do
     t.timestamp "created_at"
     t.timestamp "updated_at"
     t.string "img_base_path", limit: 256
-    t.integer "location_gis"
+    t.float "location_latitude", limit: 53
+    t.float "location_longitude", limit: 53
     t.string "location_name", limit: 1024
     t.bigint "source_id", null: false
     t.string "source_name"
@@ -42,6 +43,7 @@ ActiveRecord::Schema.define(version: 2020_06_14_041449) do
     t.text "tags", size: :long, collation: "utf8mb4_bin"
     t.integer "feature_threshold"
     t.text "image_versions", size: :long, collation: "utf8mb4_bin"
+    t.index ["location_longitude", "location_latitude", "time_id", "feature_threshold"], name: "photos_loc_gis"
     t.index ["time", "feature_threshold"], name: "photos_time"
     t.index ["time_id", "feature_threshold"], name: "photos_time_id"
     t.index ["title", "description", "location_name"], name: "photos_fulltext", type: :fulltext
@@ -55,15 +57,16 @@ ActiveRecord::Schema.define(version: 2020_06_14_041449) do
   end
 
   create_table "tags", id: :bigint, default: nil, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
-    t.string "type", limit: 32, default: "tag", null: false
+    t.string "tag_type", limit: 32, default: "tag", null: false
     t.string "name", null: false
-    t.integer "location_gis"
+    t.float "location_latitude", limit: 53
+    t.float "location_longitude", limit: 53
     t.timestamp "event_date"
     t.timestamp "created_at"
     t.timestamp "updated_at"
-    t.index ["type", "event_date", "name"], name: "tag_type_event_date"
-    t.index ["type", "location_gis"], name: "tag_type_gis"
-    t.index ["type", "name"], name: "tag_type_name"
+    t.index ["tag_type", "event_date", "name"], name: "tag_type_event_date"
+    t.index ["tag_type", "location_longitude", "location_latitude"], name: "tag_type_gis"
+    t.index ["tag_type", "name"], name: "tag_type_name"
   end
 
 end

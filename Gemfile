@@ -28,6 +28,13 @@ gem 'dry-monads'
 gem 'trailblazer', '~>2.1.0'
 gem 'trailblazer-rails', '~>2.1.7'
 
+#Gem to read EXIF (aka jpeg) metadata - IMPORTANT: Requires libexif/libexif-devel to be installed locally
+gem 'exif', "~>2.2.0"
+
+#Gem to work with imagemagick to create resized/optimized images
+# IMPORTANT: This will require the imagemagick command line tools to be installed locally
+gem "mini_magick"
+
 # Use Active Storage variant
 # gem 'image_processing', '~> 1.2'
 

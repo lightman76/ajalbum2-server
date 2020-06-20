@@ -1,0 +1,4 @@
+# This file is for default options that should be safe to use on any machine
+# Machine specific values belong in server_specific-config.yml
+place_holder:
+  value: ''
