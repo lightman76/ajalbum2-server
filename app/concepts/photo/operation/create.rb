@@ -52,20 +52,20 @@ class Photo::Create < Trailblazer::Operation
     end
     process_tag_type('tag', photo[:tag_names], tags) #eg nature, cute kids
     process_tag_type('people', photo[:tag_people], tags)
-    process_tag_type('event', photo[:tag_events], tags) #eg Yosemite trip
+    process_tag_type('event', photo[:tag_events], tags, timestamp: model.time) #eg Yosemite trip
     process_tag_type('location', photo[:tag_locations], tags, lat: model.location_latitude, long: model.location_longitude) # eg Paris
     model.tags['tags'] = tags
     true
   end
 
-  def process_tag_type(tag_type, names, tags, lat: nil, long: nil)
+  def process_tag_type(tag_type, names, tags, lat: nil, long: nil, timestamp: nil)
     if names
       names.uniq!
       names.each do |name|
         tag = ::Tag.where(tag_type: tag_type, name: name).first
         unless tag
           #TODO: should use an operation to create the tag!
-          tag = ::Tag.create(tag_type: tag_type, name: name, location_latitude: lat, location_longitude: long)
+          tag = ::Tag.create(tag_type: tag_type, name: name, location_latitude: lat, location_longitude: long, event_date: timestamp)
         end
         tags << tag.id
       end
