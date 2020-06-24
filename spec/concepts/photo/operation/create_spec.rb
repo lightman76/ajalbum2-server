@@ -9,6 +9,7 @@ RSpec.describe Photo::Create do
 
   after :each do
     @test1jpg.close
+    cleanup_test_photos
   end
 
 

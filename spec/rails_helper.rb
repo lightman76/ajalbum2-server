@@ -66,3 +66,11 @@ end
 
 APP_CONFIG["photo_storage"]["root_path"] = File.join("tmp", "test_file_root")
 FileUtils.mkdir_p(APP_CONFIG["photo_storage"]["root_path"])
+
+def cleanup_test_photos
+  if APP_CONFIG["photo_storage"]["root_path"].index('test_file_root')
+    #ok - looks good - this is still the test path
+    # Clean up any test files that where created
+    FileUtils.rm_rf(APP_CONFIG["photo_storage"]["root_path"])
+  end
+end
