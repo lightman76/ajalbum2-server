@@ -8,6 +8,7 @@ module Photo::Contract
 
     property :image_stream, virtual: true #must provide a stream with the image data
     property :original_file_name, virtual: true #when loading images from files, we likely won't be specifying a title, so we can fallback to the original file name
+    property :original_content_type, virtual: true #If image comes from a stream, we may not be easily able to find it's content type so specify here
     property :time, virtual: true #Override for time of photo, otherwise metadata in image will be used
     property :title
     property :taken_in_tz, virtual: true #offset from GMT of localtime where picture was taken

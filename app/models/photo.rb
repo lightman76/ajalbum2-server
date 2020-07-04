@@ -5,7 +5,4 @@ class Photo < ApplicationRecord
   store :metadata, coder: JSON
   store :tags, coder: JSON
 
-  def self.temporary_upload_dir()
-    return File.join(APP_CONFIG['photo_storage']['root_path'], 'tmp_upload')
-  end
 end

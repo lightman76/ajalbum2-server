@@ -12,70 +12,129 @@ RSpec.describe Photo::Create do
     cleanup_test_photos
   end
 
-
-  it "should create a photo record with correct metadata" do
+  it "should create generated images" do
     t = DateTime.now
-    params = {"photo": {"image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown'}}
+    params = {"photo": {"image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown', "original_file_name": "test1.jpg"}}
     result = ::Photo::Create.(params: params)
     expect(result).to be_success
     expect(result["model"]).not_to be_nil
     m = result["model"]
-    expect(m.location_latitude).to be_within(0.01).of(29.72)
-    expect(m.location_longitude).to be_within(0.01).of(95.75)
+    orig = m.image_versions["original"]
+    expect(orig).not_to be_nil
+    expect(orig["content_type"]).to eq("image/jpeg")
+    expect(orig["root_store"]).to eq("originals")
+    expect(orig["relative_path"]).not_to be_nil
+    expect(File.exists?(File.join(PhotoUtils.originals_path, orig["relative_path"]))).to be_truthy
+    thumb = m.image_versions["thumb"]
+    expect(thumb).not_to be_nil
+    expect(thumb["content_type"]).to eq("image/jpeg")
+    expect(thumb["version"]).to eq(1)
+    expect(thumb["root_store"]).to eq("generated")
+    expect(thumb["relative_path"]).not_to be_nil
+    expect(File.exists?(File.join(PhotoUtils.generated_images_path, thumb["relative_path"]))).to be_truthy
+    hd = m.image_versions["screenHd"]
+    expect(hd).not_to be_nil
+    expect(hd["relative_path"]).not_to be_nil
+    expect(File.exists?(File.join(PhotoUtils.generated_images_path, hd["relative_path"]))).to be_truthy
+    fr = m.image_versions["fullRes"]
+    expect(fr).not_to be_nil
+    expect(fr["relative_path"]).not_to be_nil
+    expect(File.exists?(File.join(PhotoUtils.generated_images_path, fr["relative_path"]))).to be_truthy
   end
 
-  it "should create general tag" do
-    t = DateTime.now
-    params = {"photo": {"image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown', tag_names: ["nature"]}}
-    result = ::Photo::Create.(params: params)
-    expect(result).to be_success
-    expect(result["model"]).not_to be_nil
-    m = result["model"]
-    expect(m.tags['tags'].length).to eq(1)
-    tag = ::Tag.find(m.tags['tags'][0])
-    expect(tag.name).to eq("nature")
-    expect(tag.tag_type).to eq("tag")
+  context "skip generated images" do
+    before :each do
+      @orig_gen_images = ::Photo::GenerateImages
+      ::Photo.send :remove_const, "GenerateImages"
+      ::Photo.const_set(:GenerateImages, ::MockGenerateImages)
+    end
+
+    after :each do
+      ::Photo.const_set(:GenerateImages, @orig_gen_images)
+    end
+
+    it "should create a photo record with correct metadata" do
+      t = DateTime.now
+      params = {"photo": {"image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown'}}
+      result = ::Photo::Create.(params: params)
+      expect(result).to be_success
+      expect(result["model"]).not_to be_nil
+      m = result["model"]
+      expect(m.location_latitude).to be_within(0.01).of(29.72)
+      expect(m.location_longitude).to be_within(0.01).of(95.75)
+    end
+
+
+    it "should create general tag" do
+      t = DateTime.now
+      params = {"photo": {"image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown', tag_names: ["nature"]}}
+      result = ::Photo::Create.(params: params)
+      expect(result).to be_success
+      expect(result["model"]).not_to be_nil
+      m = result["model"]
+      expect(m.tags['tags'].length).to eq(1)
+      tag = ::Tag.find(m.tags['tags'][0])
+      expect(tag.name).to eq("nature")
+      expect(tag.tag_type).to eq("tag")
+    end
+
+    it "should create person tag" do
+      t = DateTime.now
+      params = {"photo": {"image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown', tag_people: ["George Washington"]}}
+      result = ::Photo::Create.(params: params)
+      expect(result).to be_success
+      expect(result["model"]).not_to be_nil
+      m = result["model"]
+      expect(m.tags['tags'].length).to eq(1)
+      tag = ::Tag.find(m.tags['tags'][0])
+      expect(tag.name).to eq("George Washington")
+      expect(tag.tag_type).to eq("people")
+    end
+
+    it "should create event tag" do
+      t = DateTime.now
+      params = {"photo": {"image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown', tag_events: ["Washington DC Trip"]}}
+      result = ::Photo::Create.(params: params)
+      expect(result).to be_success
+      expect(result["model"]).not_to be_nil
+      m = result["model"]
+      expect(m.tags['tags'].length).to eq(1)
+      tag = ::Tag.find(m.tags['tags'][0])
+      expect(tag.name).to eq("Washington DC Trip")
+      expect(tag.tag_type).to eq("event")
+      expect(tag.event_date).to eq(result["model"].time)
+    end
+
+    it "should create location tag" do
+      t = DateTime.now
+      params = {"photo": {"image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown', tag_locations: ["Home Base"]}}
+      result = ::Photo::Create.(params: params)
+      expect(result).to be_success
+      expect(result["model"]).not_to be_nil
+      m = result["model"]
+      expect(m.tags['tags'].length).to eq(1)
+      tag = ::Tag.find(m.tags['tags'][0])
+      expect(tag.name).to eq("Home Base")
+      expect(tag.tag_type).to eq("location")
+      expect(tag.location_latitude).to eq(result["model"].location_latitude)
+      expect(tag.location_longitude).to eq(result["model"].location_longitude)
+    end
+  end
+end
+
+class ::MockGenerateImages < Trailblazer::Operation
+  step :just_pass
+
+  def just_pass(options, **)
+    true
   end
 
-  it "should create person tag" do
-    t = DateTime.now
-    params = {"photo": {"image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown', tag_people: ["George Washington"]}}
-    result = ::Photo::Create.(params: params)
-    expect(result).to be_success
-    expect(result["model"]).not_to be_nil
-    m = result["model"]
-    expect(m.tags['tags'].length).to eq(1)
-    tag = ::Tag.find(m.tags['tags'][0])
-    expect(tag.name).to eq("George Washington")
-    expect(tag.tag_type).to eq("people")
+  class Thumbnail < self
   end
 
-  it "should create event tag" do
-    t = DateTime.now
-    params = {"photo": {"image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown', tag_events: ["Washington DC Trip"]}}
-    result = ::Photo::Create.(params: params)
-    expect(result).to be_success
-    expect(result["model"]).not_to be_nil
-    m = result["model"]
-    expect(m.tags['tags'].length).to eq(1)
-    tag = ::Tag.find(m.tags['tags'][0])
-    expect(tag.name).to eq("Washington DC Trip")
-    expect(tag.tag_type).to eq("event")
-    expect(tag.event_date).to eq(result["model"].time)
+  class ScreenHd < self
   end
 
-  it "should create location tag" do
-    t = DateTime.now
-    params = {"photo": {"image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown', tag_locations: ["Home Base"]}}
-    result = ::Photo::Create.(params: params)
-    expect(result).to be_success
-    expect(result["model"]).not_to be_nil
-    m = result["model"]
-    expect(m.tags['tags'].length).to eq(1)
-    tag = ::Tag.find(m.tags['tags'][0])
-    expect(tag.name).to eq("Home Base")
-    expect(tag.tag_type).to eq("location")
-    expect(tag.location_latitude).to eq(result["model"].location_latitude)
-    expect(tag.location_longitude).to eq(result["model"].location_longitude)
+  class FullRes < self
   end
 end

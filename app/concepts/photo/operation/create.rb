@@ -1,6 +1,8 @@
 require_relative "../contract/create"
+require 'fileutils'
 
 class Photo::Create < Trailblazer::Operation
+
   step Model(Photo, :new)
   step Contract::Build(constant: ::Photo::Contract::Create)
   step Contract::Validate(key: :photo)
@@ -14,6 +16,7 @@ class Photo::Create < Trailblazer::Operation
   #   Offer a full original res at an 80-85% compression to allow zooming
   #   Store original as-is which would be only served for a download to print
   #
+  pass :initialize_warnings
   # Step 1: Save the original image to a temporary working dir so we can run operations on it
   step :temporary_persist_original_image
 
@@ -27,17 +30,56 @@ class Photo::Create < Trailblazer::Operation
   step :populate_location
   step :record_metadata
   step :process_tags
+  step :process_original_image
+  step Contract::Persist()
 
   step :process_image
-
-  step Contract::Persist()
 
 
   step :cleanup_success
   fail :cleanup_failure
   fail :debug
 
-  def process_image(options, model:, tmp_file_path:, **)
+  def initialize_warnings(options, model:, **)
+    options[:warnings] = []
+  end
+
+  def process_image(options, model:, **)
+    #TODO: call operation that generates images from the original
+    op_thumb = ::Photo::GenerateImages::Thumbnail.(params: {photo_model: model})
+    options[:warnings] << "Failed to create thumbnail: #{op_thumb.errors.details.to_json}" unless op_thumb.success?
+    op_hd = ::Photo::GenerateImages::ScreenHd.(params: {photo_model: model})
+    options[:warnings] << "Failed to create ScreenHD: #{op_hd.errors.details.to_json}" unless op_hd.success?
+    op_full = ::Photo::GenerateImages::FullRes.(params: {photo_model: model})
+    options[:warnings] << "Failed to create FullRes: #{op_full.errors.details.to_json}" unless op_full.success?
+    model.save!
+    true
+  end
+
+  def process_original_image(options, model:, tmp_file_path:, **)
+    #first copy the tmp image to the correct subdir of the originals folder
+    retry_cnt = nil
+    success = false
+    while (!success) do
+      FileUtils.mkdir_p(File.join(PhotoUtils.originals_path, PhotoUtils.base_path_for_photo(model)))
+      full_path = File.join(PhotoUtils.originals_path, PhotoUtils.base_path_for_photo(model), PhotoUtils.file_name_for_photo(model, retry_cnt: retry_cnt))
+      if File.exists?(full_path)
+        retry_cnt = retry_cnt.nil? ? 0 : (retry_cnt + 1)
+      else
+        success = true
+      end
+    end
+    #have non-conflicting file_name, store it
+    FileUtils.cp(tmp_file_path, full_path)
+    #now store it in the image_versions
+    model.image_versions['original'] = {
+        "root_store": "originals",
+        "relative_path": File.join(PhotoUtils.base_path_for_photo(model), PhotoUtils.file_name_for_photo(model, retry_cnt: retry_cnt)),
+        "content_type": model.metadata["original_content_type"],
+        "retry_cnt": retry_cnt
+    }
+    options[:original_file_path] = full_path
+    options[:original_retry_cnt] = retry_cnt
     true
   end
 
@@ -116,12 +158,21 @@ class Photo::Create < Trailblazer::Operation
       photo[:title] = photo[:original_file_name] unless photo[:title] #fall back to using the file name as the title
       original_metadata[:original_file_name] = photo[:original_file_name] #store the original file name in the metadata.  If run into problems, that may help debug
     end
+    if photo[:original_content_type]
+      original_metadata[:original_content_type] = photo[:original_content_type] #store the content type of the original as this may be transformed in the generated images
+    end
+    unless original_metadata[:original_content_type]
+      #should probably try to guess based on file name if we've got it or else look at header bytes on the file itself...
+      if photo[:original_file_name] && (/.jpg/i.match(photo[:original_file_name]) || /.jpeg/i.match(photo[:original_file_name]))
+        original_metadata[:original_content_type] = photo[:original_content_type] = "image/jpeg"
+      end
+    end
     true
   end
 
   def temporary_persist_original_image(options, params:, **)
     photo = params[:photo]
-    tmp_dir = Photo.temporary_upload_dir
+    tmp_dir = PhotoUtils.temporary_upload_dir
     FileUtils.mkdir_p(tmp_dir)
     tmp_file_path = File.join(tmp_dir, "upload_#{Process.pid}_#{Time.now.to_i}.jpg")
     File.open(tmp_file_path, 'w') do |fh|
@@ -133,6 +184,8 @@ class Photo::Create < Trailblazer::Operation
   end
 
   def load_image_metadata(options, tmp_file_path:, **)
+    #TODO: this is jpg specific, may want to separate this logic to another operation which can dispatch based on content type
+
     #Goal here is to attempt to extract a set of known metadata that we want from the images
     # ifd0:
     #   Timestamp Ruby Date from (date_time)
@@ -173,6 +226,7 @@ class Photo::Create < Trailblazer::Operation
     #   focal_length_in_35mm_film
     # Synthetic: will populate this elsewhere from the import process
     #   original_file_name
+    #   original_content_type
     exif_data = Exif::Data.new(IO.read(tmp_file_path))
 
     metadata = {}
