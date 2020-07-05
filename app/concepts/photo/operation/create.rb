@@ -104,12 +104,8 @@ class Photo::Create < Trailblazer::Operation
     if names
       names.uniq!
       names.each do |name|
-        tag = ::Tag.where(tag_type: tag_type, name: name).first
-        unless tag
-          #TODO: should use an operation to create the tag!
-          tag = ::Tag.create(tag_type: tag_type, name: name, location_latitude: lat, location_longitude: long, event_date: timestamp)
-        end
-        tags << tag.id
+        result = ::Tag::GetOrCreate.(params: {tag: {tag_type: tag_type, name: name, location_latitude: lat, location_longitude: long, event_date: timestamp}})
+        tags << result["tag"].id if result.success?
       end
     end
   end
