@@ -76,6 +76,10 @@ RSpec.describe Photo::Create do
       tag = ::Tag.find(m.tags['tags'][0])
       expect(tag.name).to eq("nature")
       expect(tag.tag_type).to eq("tag")
+      photo_tags = m.photo_tags
+      expect(photo_tags.length).to eq(1)
+      expect(photo_tags[0].tag_id).to eq(tag.id)
+      expect(photo_tags[0].photo_id).to eq(m.id)
     end
 
     it "should create person tag" do

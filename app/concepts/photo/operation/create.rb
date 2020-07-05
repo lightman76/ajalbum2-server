@@ -97,6 +97,10 @@ class Photo::Create < Trailblazer::Operation
     process_tag_type('event', photo[:tag_events], tags, timestamp: model.time) #eg Yosemite trip
     process_tag_type('location', photo[:tag_locations], tags, lat: model.location_latitude, long: model.location_longitude) # eg Paris
     model.tags['tags'] = tags
+    #materialize these tags as photo_tags
+    tags.each do |tag_id|
+      model.photo_tags << PhotoTag.new(photo: model, tag_id: tag_id, time_id: model.time_id)
+    end
     true
   end
 
