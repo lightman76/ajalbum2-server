@@ -12,6 +12,7 @@ class Photo::Search < Trailblazer::Operation
   def extra_sanity_checks(options, model:, **)
     model.page = 0 if model.page.nil? || model.page < 0
     model.results_per_page = 100 if model.results_per_page.nil? || model.results_per_page > ::Photo::Contract::Search::MAX_RESULTS_PER_PAGE
+    true
   end
 
   def process_date_params(options, model:, **)

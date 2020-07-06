@@ -76,6 +76,17 @@ RSpec.describe ::Photo::Search do
       expect(results[3].id).to eq(@p4.id)
     end
 
+    it "should return correct results for pagination" do
+      result = ::Photo::Search.(params: {search: {page: 1, results_per_page: 2}})
+      expect(result.success?).to be_truthy
+      results = result["results"]
+      expect(results).not_to be_nil
+      expect(results.length).to eq(2)
+      #now check order
+      expect(results[0].id).to eq(@p2.id)
+      expect(results[1].id).to eq(@p4.id)
+    end
+
     it "should return correct results for start_date filter" do
       result = ::Photo::Search.(params: {search: {start_date: JSON.parse((DateTime.now - 3.years).to_json)}})
       expect(result.success?).to be_truthy
