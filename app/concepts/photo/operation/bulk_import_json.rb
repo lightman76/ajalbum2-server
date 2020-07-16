@@ -34,7 +34,6 @@ class Photo::BulkImportJson < Trailblazer::Operation
               location_name: jp["location_name"],
               source_name: jp["source_name"],
               description: jp["description"],
-              metadata: jp["metadata"],
               tag_names: jp["tag_names"],
               tag_people: jp["tag_people"],
               tag_events: jp["tag_events"],
