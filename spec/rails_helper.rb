@@ -64,6 +64,7 @@ RSpec.configure do |config|
   # config.filter_gems_from_backtrace("gem name")
 end
 
+APP_CONFIG["defaults"]["timezone_offset"] = -5 * 60
 APP_CONFIG["photo_storage"]["root_path"] = File.join(Rails.root, "tmp", "test_file_root")
 APP_CONFIG["photo_storage"]["tmp_upload_path"] = File.join(APP_CONFIG['photo_storage']['root_path'], 'tmp_upload')
 APP_CONFIG["photo_storage"]["originals_path"] = File.join(APP_CONFIG["photo_storage"]["root_path"], "originals")

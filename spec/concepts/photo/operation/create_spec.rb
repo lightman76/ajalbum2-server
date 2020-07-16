@@ -59,7 +59,14 @@ RSpec.describe Photo::Create do
       result = ::Photo::Create.(params: params)
       expect(result).to be_success
       expect(result["model"]).not_to be_nil
-      m = result["model"]
+      m = Photo.get(result["model"].id)
+      expect(m.time).to be_within(1.minute).of(DateTime.now)
+      expect(m.title).to eq("Test Photo")
+      expect(m.source_id).to eq(Source.first.id)
+      expect(m.metadata).not_to be_nil
+      expect(m.metadata["exposure_time"]).not_to be_nil
+      expect(m.feature_threshold).to eq(0)
+      expect(m.taken_in_tz).to eq(-5 * 60)
       expect(m.location_latitude).to be_within(0.01).of(29.72)
       expect(m.location_longitude).to be_within(0.01).of(95.75)
     end
@@ -67,7 +74,7 @@ RSpec.describe Photo::Create do
 
     it "should create general tag" do
       t = DateTime.now
-      params = {"photo": {"image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown', tag_names: ["nature"]}}
+      params = {"photo": {"image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown', tag_names: ["nature"], feature_threshold: 10}}
       result = ::Photo::Create.(params: params)
       expect(result).to be_success
       expect(result["model"]).not_to be_nil
@@ -80,11 +87,12 @@ RSpec.describe Photo::Create do
       expect(photo_tags.length).to eq(1)
       expect(photo_tags[0].tag_id).to eq(tag.id)
       expect(photo_tags[0].photo_id).to eq(m.id)
+      expect(m.feature_threshold).to eq(10)
     end
 
     it "should create person tag" do
       t = DateTime.now
-      params = {"photo": {"image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown', tag_people: ["George Washington"]}}
+      params = {"photo": {"image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown', tag_people: ["George Washington"], feature_threshold: nil}}
       result = ::Photo::Create.(params: params)
       expect(result).to be_success
       expect(result["model"]).not_to be_nil
@@ -93,6 +101,7 @@ RSpec.describe Photo::Create do
       tag = ::Tag.find(m.tags['tags'][0])
       expect(tag.name).to eq("George Washington")
       expect(tag.tag_type).to eq("people")
+      expect(m.feature_threshold).to eq(0)
     end
 
     it "should create event tag" do

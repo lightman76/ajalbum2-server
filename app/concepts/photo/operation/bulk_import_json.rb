@@ -49,6 +49,9 @@ class Photo::BulkImportJson < Trailblazer::Operation
         options[:failure_count] += 1
         puts "!! Failed to import #{parsed_date.to_s} - #{jp["title"]} from #{from_orig_location}"
       end
+    rescue StandardError => e
+      options[:failure_count] += 1
+      puts "!! Failed to import #{parsed_date.to_s} - #{jp["title"]} from #{from_orig_location}: #{e.message}\n#{e.backtrace}"
     ensure
       file_in.close if file_in
     end

@@ -26,6 +26,7 @@ class Photo::Create < Trailblazer::Operation
   #now handle populating other "computed" fields and merging in overrides
   step :populate_time_id
   step :populate_source_id
+  step :populate_feature_threshold
   step :populate_title
   step :populate_location
   step :record_metadata
@@ -118,7 +119,8 @@ class Photo::Create < Trailblazer::Operation
     photo = params[:photo]
     metadata = original_metadata
     metadata = metadata.merge(photo[:metadata]) if photo[:metadata]
-    model[:metadata] = metadata
+    metadata.each_pair { |k, v| model.metadata[k] = v }
+
     true
   end
 
@@ -322,6 +324,12 @@ class Photo::Create < Trailblazer::Operation
     true
   end
 
+  def populate_feature_threshold(options, params:, model:, **)
+    params[:photo][:feature_threshold] = 0 if params[:photo][:feature_threshold].nil?
+    model.feature_threshold = params[:photo][:feature_threshold]
+    true
+  end
+
   def populate_time_id(options, params:, original_metadata:, model:, **)
     photo = params[:photo]
     #TODO: read this from image metadata as the default time, then if overridden, use that
@@ -335,7 +343,7 @@ class Photo::Create < Trailblazer::Operation
     if time
       model.time = time
       model.time_id = time.to_i
-      model.taken_in_tz = photo[:taken_in_tz] || original_metadata[:date_time_zone]
+      model.taken_in_tz = photo[:taken_in_tz] || original_metadata[:date_time_zone] || APP_CONFIG["defaults"]["timezone_offset"]
       return true
     end
 

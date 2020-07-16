@@ -48,7 +48,7 @@ class Photo::Search < Trailblazer::Operation
         tag_cnt += 1
       end
     end
-    query_chain = query_chain.order(time: :desc) if model.search_text.nil? || model.search_text.empty? #for full text search don't specify order
+    query_chain = query_chain.order(time: :desc)
     query_chain = query_chain.limit(model.results_per_page)
     query_chain = query_chain.offset(model.page * model.results_per_page)
     options["results"] = query_chain.all

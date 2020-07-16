@@ -35,7 +35,7 @@ class LegacyExport
 
   def do_export()
     File.open(@output_file, "w") do |out|
-      out << '{"photos":[\n'
+      out << "{\"photos\":[\n"
       conn = get_connection()
       photo_query_details = create_photo_query()
       photo_statement = conn.prepare(photo_query_details[:query])
@@ -45,13 +45,13 @@ class LegacyExport
         out << ",\n" unless is_first
         is_first = false
         json = create_photo_json(photo_row)
-        out << json.to_s if json
+        out << json.to_json if json
         puts "  Exported #{json[:taken_timestamp]}" if json
         unless json
           puts "Failed to export for #{photo_row.inspect}"
         end
       end
-      out << '\n]}\n'
+      out << "\n]}\n"
     end
   end
 
@@ -61,7 +61,7 @@ Remaining fields
 =end
     gid = photo_row["cnt_gid"]
     json = {
-        taken_timestamp: photo_row["cnt_ContentDate"],
+        taken_timestamp: photo_row["cnt_ContentDate"].strftime('%Y-%m-%dT%H:%M:%S.%L%z'),
         title: photo_row["cnt_name"],
         description: photo_row["cnt_description"],
         original_content_type: "image/jpeg",
