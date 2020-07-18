@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Photo::Create do
+RSpec.describe Photo::Operation::Create do
   before :each do
     op = ::Source::Create.(params: {source: {raw_name: 'unknown', display_name: 'Unknown'}})
     expect(op).to be_success

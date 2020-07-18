@@ -21,7 +21,7 @@ class Photo::BulkImportJson < Trailblazer::Operation
       file_in = File.open(File.join(options[:import_photo_root], from_orig_location))
       parsed_date = DateTime.iso8601(jp["taken_timestamp"])
 
-      result = ::Photo::Create.(params: {
+      result = ::Photo::Operation::Create.(params: {
           photo: {
               image_stream: file_in,
               original_file_name: jp["original_file_name"],

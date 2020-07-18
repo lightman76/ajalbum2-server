@@ -2,7 +2,7 @@ require "mini_magick"
 
 require_relative "../contract/create"
 
-class Photo::GenerateImages < Trailblazer::Operation
+class Photo::Operation::GenerateImages < Trailblazer::Operation
   step Model(OpenStruct, :new)
   step Contract::Build(constant: ::Photo::Contract::GenerateImages)
   step Contract::Validate()

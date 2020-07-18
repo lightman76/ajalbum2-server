@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ::Photo::DateOutlineSearch do
+RSpec.describe ::Photo::Operation::DateOutlineSearch do
 
   context "Basic tests" do
     before :each do
@@ -68,7 +68,7 @@ RSpec.describe ::Photo::DateOutlineSearch do
     end
 
     it "should return correct results for no filter" do
-      result = ::Photo::DateOutlineSearch.(params: {search: {}})
+      result = ::Photo::Operation::DateOutlineSearch.(params: {search: {}})
       expect(result.success?).to be_truthy
       results_by_date = result["result_count_by_date"]
       expect(results_by_date).not_to be_nil
@@ -100,7 +100,7 @@ RSpec.describe ::Photo::DateOutlineSearch do
       )
 
 
-      result = ::Photo::DateOutlineSearch.(params: {search: {}})
+      result = ::Photo::Operation::DateOutlineSearch.(params: {search: {}})
       expect(result.success?).to be_truthy
       results_by_date = result["result_count_by_date"]
       expect(results_by_date).not_to be_nil

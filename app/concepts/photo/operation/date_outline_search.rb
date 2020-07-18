@@ -1,6 +1,6 @@
 require_relative "../contract/search"
 
-class Photo::DateOutlineSearch < Trailblazer::Operation
+class Photo::Operation::DateOutlineSearch < Trailblazer::Operation
   step Model(OpenStruct, :new)
   step Contract::Build(constant: ::Photo::Contract::Search)
   step Contract::Validate(key: :search)
@@ -61,6 +61,10 @@ class Photo::DateOutlineSearch < Trailblazer::Operation
     results_by_date = results_by_date.sort { |a, b| b[:date] <=> a[:date] } #reverse date sort new->old
     options["result_count_by_date"] = results_by_date
     true
+  end
+
+  def json_response
+    options["result_count_by_date"].to_json
   end
 
 

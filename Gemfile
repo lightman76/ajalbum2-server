@@ -21,6 +21,8 @@ gem 'dry-validation', '~>0.13.3'
 gem 'dry-monads'
 gem 'trailblazer', '~>2.1.0'
 gem 'trailblazer-rails', '~>2.1.7'
+gem 'roar'
+gem 'multi_json'
 
 #Gem to read EXIF (aka jpeg) metadata - IMPORTANT: Requires libexif/libexif-devel to be installed locally
 gem 'exif', "~>2.2.0"

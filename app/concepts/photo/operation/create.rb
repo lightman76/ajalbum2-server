@@ -1,7 +1,7 @@
 require_relative "../contract/create"
 require 'fileutils'
 
-class Photo::Create < Trailblazer::Operation
+class Photo::Operation::Create < Trailblazer::Operation
 
   step Model(Photo, :new)
   step Contract::Build(constant: ::Photo::Contract::Create)
@@ -47,11 +47,11 @@ class Photo::Create < Trailblazer::Operation
 
   def process_image(options, model:, **)
     #TODO: call operation that generates images from the original
-    op_thumb = ::Photo::GenerateImages::Thumbnail.(params: {photo_model: model})
+    op_thumb = ::Photo::Operation::GenerateImages::Thumbnail.(params: {photo_model: model})
     options[:warnings] << "Failed to create thumbnail: #{op_thumb.errors.details.to_json}" unless op_thumb.success?
-    op_hd = ::Photo::GenerateImages::ScreenHd.(params: {photo_model: model})
+    op_hd = ::Photo::Operation::GenerateImages::ScreenHd.(params: {photo_model: model})
     options[:warnings] << "Failed to create ScreenHD: #{op_hd.errors.details.to_json}" unless op_hd.success?
-    op_full = ::Photo::GenerateImages::FullRes.(params: {photo_model: model})
+    op_full = ::Photo::Operation::GenerateImages::FullRes.(params: {photo_model: model})
     options[:warnings] << "Failed to create FullRes: #{op_full.errors.details.to_json}" unless op_full.success?
     model.save!
     true

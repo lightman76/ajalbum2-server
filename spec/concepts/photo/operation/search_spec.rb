@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ::Photo::Search do
+RSpec.describe ::Photo::Operation::Search do
 
   context "Basic tests" do
     before :each do
@@ -64,7 +64,7 @@ RSpec.describe ::Photo::Search do
     end
 
     it "should return correct results for no filter" do
-      result = ::Photo::Search.(params: {search: {}})
+      result = ::Photo::Operation::Search.(params: {search: {}})
       expect(result.success?).to be_truthy
       results = result["results"]
       expect(results).not_to be_nil
@@ -77,7 +77,7 @@ RSpec.describe ::Photo::Search do
     end
 
     it "should return correct results for pagination" do
-      result = ::Photo::Search.(params: {search: {page: 1, results_per_page: 2}})
+      result = ::Photo::Operation::Search.(params: {search: {page: 1, results_per_page: 2}})
       expect(result.success?).to be_truthy
       results = result["results"]
       expect(results).not_to be_nil
@@ -88,7 +88,7 @@ RSpec.describe ::Photo::Search do
     end
 
     it "should return correct results for start_date filter" do
-      result = ::Photo::Search.(params: {search: {start_date: JSON.parse((DateTime.now - 3.years).to_json)}})
+      result = ::Photo::Operation::Search.(params: {search: {start_date: JSON.parse((DateTime.now - 3.years).to_json)}})
       expect(result.success?).to be_truthy
       results = result["results"]
       expect(results).not_to be_nil
@@ -98,7 +98,7 @@ RSpec.describe ::Photo::Search do
       expect(results[1].id).to eq(@p3.id)
     end
     it "should return correct results for end_date filter" do
-      result = ::Photo::Search.(params: {search: {end_date: JSON.parse((DateTime.now - 3.years).to_json)}})
+      result = ::Photo::Operation::Search.(params: {search: {end_date: JSON.parse((DateTime.now - 3.years).to_json)}})
       expect(result.success?).to be_truthy
       results = result["results"]
       expect(results).not_to be_nil
@@ -109,7 +109,7 @@ RSpec.describe ::Photo::Search do
     end
 
     it "should return correct results for both date filters" do
-      result = ::Photo::Search.(params: {search: {start_date: JSON.parse((DateTime.now - 6.years).to_json), end_date: JSON.parse((DateTime.now - 1.years).to_json)}})
+      result = ::Photo::Operation::Search.(params: {search: {start_date: JSON.parse((DateTime.now - 6.years).to_json), end_date: JSON.parse((DateTime.now - 1.years).to_json)}})
       expect(result.success?).to be_truthy
       results = result["results"]
       expect(results).not_to be_nil
@@ -119,7 +119,7 @@ RSpec.describe ::Photo::Search do
       expect(results[1].id).to eq(@p2.id)
     end
     it "should return correct results for min_threshold" do
-      result = ::Photo::Search.(params: {search: {min_threshold: 1}})
+      result = ::Photo::Operation::Search.(params: {search: {min_threshold: 1}})
       expect(result.success?).to be_truthy
       results = result["results"]
       expect(results).not_to be_nil
@@ -129,7 +129,7 @@ RSpec.describe ::Photo::Search do
       expect(results[1].id).to eq(@p2.id)
     end
     it "should return correct results for max_threshold" do
-      result = ::Photo::Search.(params: {search: {max_threshold: 1}})
+      result = ::Photo::Operation::Search.(params: {search: {max_threshold: 1}})
       expect(result.success?).to be_truthy
       results = result["results"]
       expect(results).not_to be_nil
@@ -142,7 +142,7 @@ RSpec.describe ::Photo::Search do
 =begin
 #NOTE: we can't test mariadb full text query - looks like you can't query on un-committed inserts/updates, and I'm guessing the specs are using transactions to quickly rollback db changes.
     it "should return correct results for full text single word" do
-      result = ::Photo::Search.(params:{search:{search_text: "Sunset"}})
+      result = ::Photo::Operation::Search.(params:{search:{search_text: "Sunset"}})
       expect(result.success?).to be_truthy
       results = result["results"]
       expect(results).not_to be_nil
@@ -169,7 +169,7 @@ RSpec.describe ::Photo::Search do
       end
 
       it "should find photos for tag tag1" do
-        result = ::Photo::Search.(params: {search: {tags: [@ttag1.id]}})
+        result = ::Photo::Operation::Search.(params: {search: {tags: [@ttag1.id]}})
         expect(result.success?).to be_truthy
         results = result["results"]
         expect(results).not_to be_nil
@@ -180,7 +180,7 @@ RSpec.describe ::Photo::Search do
       end
 
       it "should find photos for person tag1" do
-        result = ::Photo::Search.(params: {search: {tags: [@ptag1.id]}})
+        result = ::Photo::Operation::Search.(params: {search: {tags: [@ptag1.id]}})
         expect(result.success?).to be_truthy
         results = result["results"]
         expect(results).not_to be_nil

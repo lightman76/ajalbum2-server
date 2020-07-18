@@ -1,6 +1,6 @@
 require_relative "../contract/search"
 
-class Photo::Search < Trailblazer::Operation
+class Photo::Operation::Search < Trailblazer::Operation
   step Model(OpenStruct, :new)
   step Contract::Build(constant: ::Photo::Contract::Search)
   step Contract::Validate(key: :search)
@@ -10,7 +10,9 @@ class Photo::Search < Trailblazer::Operation
   step :search!
 
   def extra_sanity_checks(options, model:, **)
+    model.page = model.page.to_i if model.page && model.page.class == String
     model.page = 0 if model.page.nil? || model.page < 0
+    model.results_per_page = model.results_per_page.to_i if model.results_per_page && model.results_per_page.class == String
     model.results_per_page = 100 if model.results_per_page.nil? || model.results_per_page > ::Photo::Contract::Search::MAX_RESULTS_PER_PAGE
     true
   end
@@ -53,6 +55,10 @@ class Photo::Search < Trailblazer::Operation
     query_chain = query_chain.offset(model.page * model.results_per_page)
     options["results"] = query_chain.all
     true
+  end
+
+  def self.json_response(options)
+    ::Photo::Representer::PhotoResult.represent(options["results"]).to_json
   end
 
 
