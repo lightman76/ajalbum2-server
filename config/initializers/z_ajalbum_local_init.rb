@@ -43,3 +43,6 @@ zone_offset_hour = zone_offset_hour.to_i
 zone_offset_min = zone_offset_min.to_i
 APP_CONFIG["defaults"]["timezone_offset"] = zone_offset_hour * 60 + (zone_offset_hour / (zone_offset_hour.abs)) * zone_offset_min
 
+if APP_CONFIG["alternate_host1"]
+  Rails.configuration.hosts << APP_CONFIG["alternate_host1"]
+end

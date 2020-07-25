@@ -57,9 +57,4 @@ class Photo::Operation::Search < Trailblazer::Operation
     true
   end
 
-  def self.json_response(options)
-    ::Photo::Representer::PhotoResult.represent(options["results"]).to_json
-  end
-
-
 end

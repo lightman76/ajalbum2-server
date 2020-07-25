@@ -5,7 +5,12 @@ module Api
 
       def search
         if (result = ::Photo::Operation::Search.(params: {search: params})).success?
-          render json: ::Photo::Representer::PhotoResult.represent(result["results"].to_a).to_json
+          out = {
+              page: result[:model].page,
+              results_per_page: result[:model].results_per_page,
+              photos: ::Photo::Representer::PhotoResult.represent(result["results"].to_a).to_hash
+          }
+          render json: out.to_json
           return
         end
         render_api_validation_error(result, "Search failed:")
