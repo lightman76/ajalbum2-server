@@ -10,6 +10,7 @@ class Photo::BulkImportJson < Trailblazer::Operation
   def process_params(options, params:, **)
     options[:json_data] = params[:json_data]
     options[:import_photo_root] = params[:import_photo_root] #path which from_original_file_path's are relative
+    options[:skip_autorotate] = params[:skip_autorotate]
     options[:success_count] = 0
     options[:failure_count] = 0
     true
@@ -39,6 +40,7 @@ class Photo::BulkImportJson < Trailblazer::Operation
               tag_events: jp["tag_events"],
               tag_locations: jp["tag_locations"],
               feature_threshold: jp["feature_threshold"],
+              autorotate: !options[:skip_autorotate]
           }
       })
       if result.success?

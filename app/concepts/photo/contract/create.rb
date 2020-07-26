@@ -24,6 +24,7 @@ module Photo::Contract
     property :tag_events, virtual: true #array of event tags - primarily for legacy migration
     property :tag_locations, virtual: true #array of location tags - primarily for legacy migration
     property :feature_threshold, virtual: true #discriminator to filter out lower value pictures, archive, etc.  Default to 0, negative means probably shouldn't show, positive good to great picture, highlight
+    property :autorotate, virtual: true #should we auto-rotate the image based on the metadata or leave orientation as is.  Old version appears to have rotated the original images but not updated the metadata to reflect this rotation causing them to be "double rotated"
 
     validation do
       required(:image_stream).filled

@@ -7,6 +7,7 @@ module Photo::Contract
     include Dry
 
     property :photo_model
+    property :autorotate, virtual: true
 
     validation do
       required(:photo_model).filled

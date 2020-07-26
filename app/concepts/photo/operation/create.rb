@@ -47,11 +47,11 @@ class Photo::Operation::Create < Trailblazer::Operation
 
   def process_image(options, model:, **)
     #TODO: call operation that generates images from the original
-    op_thumb = ::Photo::Operation::GenerateImages::Thumbnail.(params: {photo_model: model})
+    op_thumb = ::Photo::Operation::GenerateImages::Thumbnail.(params: {photo_model: model, autorotate: options["params"][:autorotate]})
     options[:warnings] << "Failed to create thumbnail: #{op_thumb.errors.details.to_json}" unless op_thumb.success?
-    op_hd = ::Photo::Operation::GenerateImages::ScreenHd.(params: {photo_model: model})
+    op_hd = ::Photo::Operation::GenerateImages::ScreenHd.(params: {photo_model: model, autorotate: options["params"][:autorotate]})
     options[:warnings] << "Failed to create ScreenHD: #{op_hd.errors.details.to_json}" unless op_hd.success?
-    op_full = ::Photo::Operation::GenerateImages::FullRes.(params: {photo_model: model})
+    op_full = ::Photo::Operation::GenerateImages::FullRes.(params: {photo_model: model, autorotate: options["params"][:autorotate]})
     options[:warnings] << "Failed to create FullRes: #{op_full.errors.details.to_json}" unless op_full.success?
     model.save!
     true

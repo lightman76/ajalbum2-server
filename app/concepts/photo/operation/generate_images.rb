@@ -11,13 +11,14 @@ class Photo::Operation::GenerateImages < Trailblazer::Operation
 
   def process_image(options, model:, params:, **)
     photo_model = params[:photo_model]
+    autorotate = params[:autorotate]
     original_file_path = File.join(PhotoUtils.originals_path, photo_model.image_versions["original"]["relative_path"])
     original_retry_cnt = photo_model.image_versions["original"]["retry_count"]
     variant_relative_path = file_relative_path(photo_model, get_variant(), original_retry_cnt)
     variant_full_path = File.join(PhotoUtils.generated_images_path, variant_relative_path)
     FileUtils.mkdir_p(File.dirname(variant_full_path))
 
-    create_resized_image(original_file_path, variant_full_path)
+    create_resized_image(original_file_path, variant_full_path, autorotate)
 
     photo_model.image_versions[get_variant()] = {
         "root_store": "generated",
@@ -33,7 +34,7 @@ class Photo::Operation::GenerateImages < Trailblazer::Operation
     raise "unimplemented"
   end
 
-  def create_resized_image(original_file_path, variant_full_path)
+  def create_resized_image(original_file_path, variant_full_path, autorotate)
     raise "unimplemented"
   end
 
@@ -44,7 +45,7 @@ class Photo::Operation::GenerateImages < Trailblazer::Operation
       'thumb'
     end
 
-    def create_resized_image(original_file_path, variant_full_path)
+    def create_resized_image(original_file_path, variant_full_path, autorotate)
       # thumbnail pipeline
       # convert ~/Downloads/test.jpg
       # -auto-orient
@@ -64,8 +65,8 @@ class Photo::Operation::GenerateImages < Trailblazer::Operation
       # ~/tmp/thumb-test.jpg
       MiniMagick::Tool::Convert.new do |convert|
         convert << original_file_path
-        convert.merge! ["-auto-orient",
-                        "-filter", "Triangle",
+        convert.merge! ["-auto-orient"] if autorotate
+        convert.merge! ["-filter", "Triangle",
                         "-define", "filter:support=2",
                         "-resize", "300x300^",
                         "-gravity", "center",
@@ -91,7 +92,7 @@ class Photo::Operation::GenerateImages < Trailblazer::Operation
       'screenHd'
     end
 
-    def create_resized_image(original_file_path, variant_full_path)
+    def create_resized_image(original_file_path, variant_full_path, autorotate)
       # convert ~/Downloads/testPeruOrig.jpg
       # -auto-orient
       # -filter Triangle
@@ -108,8 +109,8 @@ class Photo::Operation::GenerateImages < Trailblazer::Operation
       # ~/Downloads/testPeru1b.jpg
       MiniMagick::Tool::Convert.new do |convert|
         convert << original_file_path
-        convert.merge! ["-auto-orient",
-                        "-filter", "Triangle",
+        convert.merge! ["-auto-orient"] if autorotate
+        convert.merge! ["-filter", "Triangle",
                         "-define", "filter:support=2",
                         "-resize", "1920x1920",
                         "-unsharp", "0.25x0.08+8.3+0.045",
@@ -132,7 +133,7 @@ class Photo::Operation::GenerateImages < Trailblazer::Operation
       'fullRes'
     end
 
-    def create_resized_image(original_file_path, variant_full_path)
+    def create_resized_image(original_file_path, variant_full_path, autorotate)
       # convert ~/Downloads/testPeruOrig.jpg
       # -auto-orient
       # -filter Triangle
@@ -148,8 +149,8 @@ class Photo::Operation::GenerateImages < Trailblazer::Operation
       # ~/Downloads/testPeru1b.jpg
       MiniMagick::Tool::Convert.new do |convert|
         convert << original_file_path
-        convert.merge! ["-auto-orient",
-                        "-filter", "Triangle",
+        convert.merge! ["-auto-orient"] if autorotate
+        convert.merge! ["-filter", "Triangle",
                         "-define", "filter:support=2",
                         "-unsharp", "0.25x0.08+8.3+0.045",
                         "-dither", "None",
