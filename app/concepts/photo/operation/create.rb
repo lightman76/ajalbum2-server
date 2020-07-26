@@ -97,6 +97,7 @@ class Photo::Operation::Create < Trailblazer::Operation
     process_tag_type('people', photo[:tag_people], tags)
     process_tag_type('event', photo[:tag_events], tags, timestamp: model.time) #eg Yosemite trip
     process_tag_type('location', photo[:tag_locations], tags, lat: model.location_latitude, long: model.location_longitude) # eg Paris
+    process_tag_type('album', photo[:tag_albums], tags) #this will be just the album name.  Will need a separate process to export album details and import that to add/update the tags with the additional album details
     model.tags['tags'] = tags
     #materialize these tags as photo_tags
     tags.each do |tag_id|

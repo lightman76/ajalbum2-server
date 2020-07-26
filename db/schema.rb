@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_14_041449) do
+ActiveRecord::Schema.define(version: 2020_07_26_054421) do
 
   create_table "idgentable", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "next_value"
@@ -64,6 +64,9 @@ ActiveRecord::Schema.define(version: 2020_06_14_041449) do
     t.timestamp "event_date"
     t.timestamp "created_at"
     t.timestamp "updated_at"
+    t.string "shortcut_url", limit: 64
+    t.text "description", size: :medium
+    t.index ["shortcut_url"], name: "shortcut_url", unique: true
     t.index ["tag_type", "event_date", "name"], name: "tag_type_event_date"
     t.index ["tag_type", "location_longitude", "location_latitude"], name: "tag_type_gis"
     t.index ["tag_type", "name"], name: "tag_type_name"

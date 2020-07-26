@@ -39,6 +39,7 @@ class Photo::BulkImportJson < Trailblazer::Operation
               tag_people: jp["tag_people"],
               tag_events: jp["tag_events"],
               tag_locations: jp["tag_locations"],
+              tag_albums: jp["tag_albums"],
               feature_threshold: jp["feature_threshold"],
               autorotate: !options[:skip_autorotate]
           }

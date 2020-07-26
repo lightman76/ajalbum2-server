@@ -56,9 +56,6 @@ class LegacyExport
   end
 
   def create_photo_json(photo_row)
-=begin
-Remaining fields
-=end
     gid = photo_row["cnt_gid"]
     json = {
         taken_timestamp: photo_row["cnt_ContentDate"].strftime('%Y-%m-%dT%H:%M:%S.%L%z'),
@@ -101,6 +98,15 @@ Remaining fields
     else
       json[:source_name] = 'Unknown'
     end
+
+    #now look if photo is in an album
+    album_names = []
+    results = conn.query("select a.alb_name from t_jaalb_album a inner join t_jaale_albumelement e on a.alb_gid=e.ale_parentgid where e.ale_contentchildgid='#{gid}'")
+    results.each do |row|
+      album_names << row["alb_name"]
+    end
+    json[:tag_albums] = album_names if album_names.length > 0
+
     json
   end
 
