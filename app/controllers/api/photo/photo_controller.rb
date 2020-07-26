@@ -4,7 +4,12 @@ module Api
     class PhotoController < ApplicationController
 
       def search
-        if (result = ::Photo::Operation::Search.(params: {search: params})).success?
+        query = params
+        if request.method == 'POST'
+          query = JSON.parse(request.body.read)
+        end
+        #puts "Processing search with query=#{query.inspect}"
+        if (result = ::Photo::Operation::Search.(params: {search: query})).success?
           out = {
               page: result[:model].page,
               results_per_page: result[:model].results_per_page,
