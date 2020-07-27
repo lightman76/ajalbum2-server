@@ -77,7 +77,7 @@ RSpec.describe ::Photo::Operation::Search do
     end
 
     it "should return correct results for pagination" do
-      result = ::Photo::Operation::Search.(params: {search: {page: 1, results_per_page: 2}})
+      result = ::Photo::Operation::Search.(params: {search: {offset_date: @p1t - 3.years, target_max_results: 2}})
       expect(result.success?).to be_truthy
       results = result["results"]
       expect(results).not_to be_nil

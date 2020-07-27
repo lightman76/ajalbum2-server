@@ -2,7 +2,7 @@ require_relative "../contract/search"
 
 class Photo::Operation::DateOutlineSearch < Trailblazer::Operation
   step Model(OpenStruct, :new)
-  step Contract::Build(constant: ::Photo::Contract::Search)
+  step Contract::Build(constant: ::Photo::Contract::DateOutlineSearch)
   step Contract::Validate(key: :search)
   step :sync_to_model
   step :extra_sanity_checks
@@ -10,8 +10,11 @@ class Photo::Operation::DateOutlineSearch < Trailblazer::Operation
   step :search!
 
   def extra_sanity_checks(options, model:, **)
-    model.page = 0 if model.page.nil? || model.page < 0
-    model.results_per_page = 100 if model.results_per_page.nil? || model.results_per_page > ::Photo::Contract::Search::MAX_RESULTS_PER_PAGE
+    model.offset_date = AJUtils.parse_dashed_date_eod(model.offset_date) if model.offset_date.class == String
+    model.offset_date = model.end_date unless model.offset_date
+    model.offset_date = DateTime.now unless model.offset_date
+
+    model.max_days_results = 100 if model.max_days_results.nil? || model.max_days_results > ::Photo::Contract::DateOutlineSearch::MAX_DAY_RESULTS
     true
   end
 
@@ -34,7 +37,7 @@ class Photo::Operation::DateOutlineSearch < Trailblazer::Operation
     query_chain = ::Photo.group('date(time)')
     query_chain = query_chain.where(["MATCH(title, description, location_name) AGAINST (?)", model.search_text]) if model.search_text
     query_chain = query_chain.where(["time >= ?", model.start_date]) if model.start_date
-    query_chain = query_chain.where(["time < ?", model.end_date]) if model.end_date
+    query_chain = query_chain.where(["time < ?", model.offset_date]) #always use offset date
     query_chain = query_chain.where(["feature_threshold >= ?", model.min_threshold]) if model.min_threshold
     query_chain = query_chain.where(["feature_threshold <= ?", model.max_threshold]) if model.max_threshold
     if model.tags && model.tags.length > 0
@@ -49,8 +52,7 @@ class Photo::Operation::DateOutlineSearch < Trailblazer::Operation
       end
     end
     query_chain = query_chain.order(time: :desc)
-    query_chain = query_chain.limit(model.results_per_page)
-    query_chain = query_chain.offset(model.page * model.results_per_page)
+    query_chain = query_chain.limit(model.max_days_results)
     results_by_date_hash = query_chain.count(:id)
 
     results_by_date = []
