@@ -53,14 +53,15 @@ class Photo::Operation::Search < Trailblazer::Operation
       end
     end
     query_chain = query_chain.order(time: :desc)
-    query_chain = query_chain.limit(model.results_per_page)
+    query_chain = query_chain.limit(model.target_max_results)
     options["results"] = query_chain.all.to_a
-
+    options["next_offset_date"] = nil
     last_result = options["results"].last
     if last_result
       #now make sure we have ALL matches for this earliest day of the result set
-      last_result_date = last_result.time.to_datetime
+      last_result_date = last_result.time.to_time.localtime.to_datetime
       earliest_limit = DateTime.new(last_result_date.year, last_result_date.month, last_result_date.day, 0, 0, 0, APP_CONFIG["defaults"]["timezone_offset_str"])
+      options["next_offset_date"] = earliest_limit
       if model.start_date.nil? || earliest_limit > model.start_date
         query_chain = ::Photo
         query_chain = query_chain.where(["MATCH(title, description, location_name) AGAINST (?)", model.search_text]) if model.search_text

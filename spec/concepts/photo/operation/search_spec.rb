@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'time'
 
 RSpec.describe ::Photo::Operation::Search do
 
@@ -77,7 +78,31 @@ RSpec.describe ::Photo::Operation::Search do
     end
 
     it "should return correct results for pagination" do
-      result = ::Photo::Operation::Search.(params: {search: {offset_date: @p1t - 3.years, target_max_results: 2}})
+      result = ::Photo::Operation::Search.(params: {search: {offset_date: @p1t - 1.years + 1.day, target_max_results: 2}})
+      expect(result.success?).to be_truthy
+      results = result["results"]
+      expect(results).not_to be_nil
+      expect(results.length).to eq(2)
+      #now check order
+      expect(results[0].id).to eq(@p3.id)
+      expect(results[1].id).to eq(@p2.id)
+    end
+
+    it "should return correct next_offset_date for pagination" do
+      result = ::Photo::Operation::Search.(params: {search: {target_max_results: 2}})
+      expect(result.success?).to be_truthy
+      results = result["results"]
+      expect(results).not_to be_nil
+      expect(results.length).to eq(2)
+      next_offset = result["next_offset_date"]
+      expect(next_offset < @p3t).to be_truthy
+      expect(next_offset).to be_within(25.hours).of(@p3t)
+      results = result["results"]
+      #now check order
+      expect(results[0].id).to eq(@p1.id)
+      expect(results[1].id).to eq(@p3.id)
+
+      result = ::Photo::Operation::Search.(params: {search: {offset_date: next_offset, target_max_results: 2}})
       expect(result.success?).to be_truthy
       results = result["results"]
       expect(results).not_to be_nil

@@ -11,8 +11,8 @@ module Api
         #puts "Processing search with query=#{query.inspect}"
         if (result = ::Photo::Operation::Search.(params: {search: query})).success?
           out = {
-              page: result[:model].page,
-              results_per_page: result[:model].results_per_page,
+              offset_date: result[:model].offset_date,
+              next_offset_date: result["next_offset_date"],
               photos: ::Photo::Representer::PhotoResult.represent(result["results"].to_a).to_hash
           }
           render json: out.to_json
