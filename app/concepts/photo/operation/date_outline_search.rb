@@ -56,12 +56,21 @@ class Photo::Operation::DateOutlineSearch < Trailblazer::Operation
     results_by_date_hash = query_chain.count(:id)
 
     results_by_date = []
+    earliest_date = nil
     results_by_date_hash.each_pair do |d, cnt|
+      earliest_date = d if earliest_date.nil? || d < earliest_date
       results_by_date << {date: sprintf("%04d-%02d-%02d", d.year, d.month, d.day), num_items: cnt}
     end
 
-    results_by_date = results_by_date.sort { |a, b| b[:date] <=> a[:date] } #reverse date sort new->old
-    options["result_count_by_date"] = results_by_date
+    options["result_count_by_date"] = results_by_date = results_by_date.sort { |a, b| b[:date] <=> a[:date] } #reverse date sort new->old
+
+    if earliest_date
+      options["next_offset_date"] = earliest_date - 1.day
+    end
+    #if we've gone beyond the start date, return a nil next_offset_date
+    if model.start_date && options["next_offset_date"] && options["next_offset_date"] <= model.start_date
+      options["next_offset_date"] = nil
+    end
     true
   end
 
