@@ -343,7 +343,7 @@ class Photo::Operation::Create < Trailblazer::Operation
     time = photo[:time] if photo[:time] #if time metadata overridden
     if time
       model.time = time
-      model.time_id = time.to_i
+      model.time_id = time.to_i * 1000 #this should be in milliseconds
       model.taken_in_tz = photo[:taken_in_tz] || original_metadata[:date_time_zone] || APP_CONFIG["defaults"]["timezone_offset"]
       return true
     end
