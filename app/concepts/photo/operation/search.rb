@@ -26,6 +26,14 @@ class Photo::Operation::Search < Trailblazer::Operation
     if model.end_date
       model.end_date = DateTime.iso8601(model.end_date)
     end
+    model.timezone_offset_min = nil unless model.timezone_offset_min.class == Integer
+    if model.timezone_offset_min
+      #TODO: cache this somehow?
+      time_zone = ActiveSupport::TimeZone.all.detect do |zone|
+        zone.now.utc_offset == model.timezone_offset_min * 60
+      end
+      Time.zone = time_zone
+    end
     true
   end
 

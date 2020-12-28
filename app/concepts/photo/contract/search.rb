@@ -24,6 +24,7 @@ module Photo::Contract
     #
     property :offset_date #instead of "page number" for pagination, defaults to end_date or today
     property :target_max_results
+    property :timezone_offset_min #timezone offset minutes of the client - need this since pagination depends on the dates- need  these to line up...
 
   end
 end

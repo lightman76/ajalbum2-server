@@ -25,6 +25,14 @@ class Photo::Operation::DateOutlineSearch < Trailblazer::Operation
     if model.end_date
       model.end_date = DateTime.iso8601(model.end_date)
     end
+    model.timezone_offset_min = nil unless model.timezone_offset_min.class == Integer
+    if model.timezone_offset_min
+      #TODO: cache this somehow?
+      time_zone = ActiveSupport::TimeZone.all.detect do |zone|
+        zone.now.utc_offset == model.timezone_offset_min * 60
+      end
+      Time.zone = time_zone
+    end
     true
   end
 
@@ -34,7 +42,8 @@ class Photo::Operation::DateOutlineSearch < Trailblazer::Operation
   end
 
   def search!(options, model:, **)
-    query_chain = ::Photo.group('date(time)')
+    #query_chain = ::Photo.group('date(time)')
+    query_chain = ::Photo.group("TIMESTAMPADD(MINUTE,#{-1 * model.timezone_offset_min},date(CONVERT_TZ(time,'+00:00','#{format_zone_offset(model.timezone_offset_min)}')))")
     query_chain = query_chain.where(["MATCH(title, description, location_name) AGAINST (?)", model.search_text]) if model.search_text
     query_chain = query_chain.where(["time >= ?", model.start_date]) if model.start_date
     query_chain = query_chain.where(["time < ?", model.offset_date]) #always use offset date
@@ -72,6 +81,10 @@ class Photo::Operation::DateOutlineSearch < Trailblazer::Operation
       options["next_offset_date"] = nil
     end
     true
+  end
+
+  def format_zone_offset(offset_min)
+    sprintf("%s%02d:%02d", (offset_min >= 0 ? "+" : "-"), (offset_min / 60).abs, (offset_min % 60).abs)
   end
 
   def json_response
