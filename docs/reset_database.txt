@@ -1,0 +1,7 @@
+
+Use the following to reset the database and then clear your directories
+
+truncate table photo_tags;
+truncate table photos;
+truncate table sources;
+truncate table tags;

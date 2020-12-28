@@ -20,12 +20,16 @@ class Photo::Operation::GenerateImages < Trailblazer::Operation
 
     create_resized_image(original_file_path, variant_full_path, autorotate)
 
+    get_image_dims(variant_full_path)
+
     photo_model.image_versions[get_variant()] = {
-        "root_store": "generated",
-        "relative_path": variant_relative_path,
-        "content_type": "image/jpeg",
-        "retry_cnt": original_retry_cnt,
-        "version": 1
+      "root_store": "generated",
+      "relative_path": variant_relative_path,
+      "content_type": "image/jpeg",
+      "retry_cnt": original_retry_cnt,
+      "version": 1,
+      "width": @width,
+      "height": @height,
     }
     true
   end
@@ -34,10 +38,15 @@ class Photo::Operation::GenerateImages < Trailblazer::Operation
     raise "unimplemented"
   end
 
+  def get_image_dims(image_path)
+    image = MiniMagick::Image.open(image_path)
+    @width = image[:width]
+    @height = image[:height]
+  end
+
   def create_resized_image(original_file_path, variant_full_path, autorotate)
     raise "unimplemented"
   end
-
 
   class Thumbnail < self
 
