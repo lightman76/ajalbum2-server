@@ -1,6 +1,6 @@
 require_relative "../contract/search"
 
-class Photo::Operation::DateOutlineSearch < Trailblazer::Operation
+class Photo::Operation::DateOutlineSearch < BaseOperation
   step Model(OpenStruct, :new)
   step Contract::Build(constant: ::Photo::Contract::DateOutlineSearch)
   step Contract::Validate(key: :search)
@@ -26,6 +26,7 @@ class Photo::Operation::DateOutlineSearch < Trailblazer::Operation
       model.end_date = DateTime.iso8601(model.end_date)
     end
     model.timezone_offset_min = nil unless model.timezone_offset_min.class == Integer
+    model.timezone_offset_min = 0 unless !model.timezone_offset_min.nil?
     if model.timezone_offset_min
       #TODO: cache this somehow?
       time_zone = ActiveSupport::TimeZone.all.detect do |zone|
@@ -33,11 +34,6 @@ class Photo::Operation::DateOutlineSearch < Trailblazer::Operation
       end
       Time.zone = time_zone
     end
-    true
-  end
-
-  def sync_to_model(options, model:, **)
-    options["contract.default"].sync
     true
   end
 

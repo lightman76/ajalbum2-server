@@ -68,7 +68,7 @@ RSpec.describe ::Photo::Operation::DateOutlineSearch do
     end
 
     it "should return correct results for no filter" do
-      result = ::Photo::Operation::DateOutlineSearch.(params: {search: {}})
+      result = ::Photo::Operation::DateOutlineSearch.(params: { search: { timezone_offset_min: -5 * 60 } })
       expect(result.success?).to be_truthy
       results_by_date = result["result_count_by_date"]
       expect(results_by_date).not_to be_nil
@@ -99,8 +99,7 @@ RSpec.describe ::Photo::Operation::DateOutlineSearch do
                           image_versions: {}
       )
 
-
-      result = ::Photo::Operation::DateOutlineSearch.(params: {search: {}})
+      result = ::Photo::Operation::DateOutlineSearch.(params: { search: { timezone_offset_min: -5 * 60 } })
       expect(result.success?).to be_truthy
       results_by_date = result["result_count_by_date"]
       expect(results_by_date).not_to be_nil
