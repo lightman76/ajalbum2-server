@@ -6,5 +6,7 @@ Rails.application.routes.draw do
   get 'api/photo/date_outline_search' => 'api/photo/photo#date_outline_search'
   post 'api/photo/date_outline_search' => 'api/photo/photo#date_outline_search'
 
+  post 'api/tag' => 'api/tag/tag#search_tags'
+  post 'api/tag/ids' => 'api/tag/tag#tags_by_id'
 
 end
