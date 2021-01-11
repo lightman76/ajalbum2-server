@@ -18,7 +18,7 @@ module Photo::Representer
     property :source_id
     property :source_name
     property :metadata
-    property :tags
+    property :tags, :getter => lambda { |a| tags['tags'] }
     property :feature_threshold
     property :image_versions
   end
