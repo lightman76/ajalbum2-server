@@ -7,7 +7,7 @@ module Api
         if request.method == 'POST'
           query = JSON.parse(request.body.read)
         end
-        if (result = ::Tag::Operation::RetrieveTagsById.(params: { ids: query[:ids] })).success?
+        if (result = ::Tag::Operation::RetrieveTagsById.(params: { ids: query })).success?
           render json: { tags: result["tags_by_id"] }.to_json
           return
         end
