@@ -17,10 +17,11 @@ gem 'puma', '~> 4.1'
 # Use Active Model has_secure_password
 gem 'bcrypt', '~> 3.1.7'
 
-gem 'dry-validation', '~>0.13.3'
+gem 'dry-validation', '~>1.5.0'
 gem 'dry-monads'
 gem 'trailblazer', '~>2.1.0'
 gem 'trailblazer-rails', '~>2.1.7'
+gem 'reform-rails', '~>2.6.0'
 gem 'roar'
 gem 'multi_json'
 

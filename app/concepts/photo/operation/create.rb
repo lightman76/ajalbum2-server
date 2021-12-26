@@ -23,7 +23,7 @@ class Photo::Operation::Create < ::BaseOperation
   #Load the image metadata
   step :load_image_metadata
 
-  step :hydrate_user_params
+  step :hydrate_user_param
 
   #now handle populating other "computed" fields and merging in overrides
   step :populate_time_id
