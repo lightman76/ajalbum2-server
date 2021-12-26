@@ -2,8 +2,13 @@ require 'rails_helper'
 
 RSpec.describe Tag::GetOrCreate do
 
+  before :each do
+    op = ::User::Operation::CreateUser.(params: { user: { user_name: "fred" } })
+    @user = op[:user]
+  end
+
   it "should create new tag tag" do
-    params = {"tag": {"tag_type": "tag", "name": "Test Tag 1"}}
+    params = { "tag": { "user": "fred", "tag_type": "tag", "name": "Test Tag 1" } }
     result = ::Tag::GetOrCreate.(params: params)
     expect(result).to be_success
     expect(result["tag"]).not_to be_nil
@@ -13,7 +18,7 @@ RSpec.describe Tag::GetOrCreate do
   end
 
   it "should find existing tag" do
-    params = {"tag": {"tag_type": "tag", "name": "Test Tag 1"}}
+    params = { "tag": { "user": "fred", "tag_type": "tag", "name": "Test Tag 1" } }
     result = ::Tag::GetOrCreate.(params: params)
     expect(result).to be_success
     tag1 = result["tag"]
@@ -24,5 +29,5 @@ RSpec.describe Tag::GetOrCreate do
     tag2 = result2["tag"]
     expect(tag1.id).to eq(tag2.id)
   end
-
+  #
 end

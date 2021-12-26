@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_26_054421) do
+ActiveRecord::Schema.define(version: 2021_10_17_025908) do
 
   create_table "idgentable", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "next_value"
@@ -26,6 +26,7 @@ ActiveRecord::Schema.define(version: 2020_07_26_054421) do
   end
 
   create_table "photos", id: :bigint, default: nil, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
+    t.bigint "user_id", default: 0, null: false
     t.string "title", limit: 1024
     t.bigint "time_id", null: false
     t.timestamp "time"
@@ -43,10 +44,10 @@ ActiveRecord::Schema.define(version: 2020_07_26_054421) do
     t.text "tags", size: :long, collation: "utf8mb4_bin"
     t.integer "feature_threshold"
     t.text "image_versions", size: :long, collation: "utf8mb4_bin"
-    t.index ["location_longitude", "location_latitude", "time_id", "feature_threshold"], name: "photos_loc_gis"
-    t.index ["time", "feature_threshold"], name: "photos_time"
-    t.index ["time_id", "feature_threshold"], name: "photos_time_id"
     t.index ["title", "description", "location_name"], name: "photos_fulltext", type: :fulltext
+    t.index ["user_id", "location_longitude", "location_latitude", "time_id", "feature_threshold"], name: "photos_loc_gis"
+    t.index ["user_id", "time", "feature_threshold"], name: "photos_time"
+    t.index ["user_id", "time_id", "feature_threshold"], name: "photos_time_id"
   end
 
   create_table "sources", id: :bigint, default: nil, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
@@ -54,9 +55,11 @@ ActiveRecord::Schema.define(version: 2020_07_26_054421) do
     t.string "display_name", null: false
     t.timestamp "created_at"
     t.timestamp "updated_at"
+    t.bigint "user_id", default: 0, null: false
   end
 
   create_table "tags", id: :bigint, default: nil, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
+    t.bigint "user_id", default: 0, null: false
     t.string "tag_type", limit: 32, default: "tag", null: false
     t.string "name", null: false
     t.float "location_latitude", limit: 53
@@ -67,9 +70,14 @@ ActiveRecord::Schema.define(version: 2020_07_26_054421) do
     t.string "shortcut_url", limit: 64
     t.text "description", size: :medium
     t.index ["shortcut_url"], name: "shortcut_url", unique: true
-    t.index ["tag_type", "event_date", "name"], name: "tag_type_event_date"
-    t.index ["tag_type", "location_longitude", "location_latitude"], name: "tag_type_gis"
-    t.index ["tag_type", "name"], name: "tag_type_name"
+    t.index ["user_id", "tag_type", "event_date", "name"], name: "tag_type_event_date"
+    t.index ["user_id", "tag_type", "location_longitude", "location_latitude"], name: "tag_type_gis"
+    t.index ["user_id", "tag_type", "name"], name: "tag_type_name"
+  end
+
+  create_table "users", id: :bigint, default: nil, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
+    t.string "username", limit: 64, null: false
+    t.index ["username"], name: "users_username", unique: true
   end
 
 end

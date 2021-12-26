@@ -1,0 +1,4 @@
+ruby lib/legacy_export.rb -H 127.0.0.1 -p 3302 -d ajalbumprod -u jalbumadmin -P Tr1l0gY --output-file ~/tmp/jalbum2.json --start-date 2005-04-01 --end-date 2005-06-01
+
+#to import
+rake import:json[/Users/delpha/tmp/jalbum2.json,/Users/delpha/myfiles/photos/albumcopy,true]

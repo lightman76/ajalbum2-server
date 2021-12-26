@@ -1,7 +1,7 @@
 class AddUsersTable < ActiveRecord::Migration[6.0]
   def up
-    execute("create table users (id bigint primary key, username varchar(64) not null)")
-    execute("create index users_username on users(username)")
+    execute("create table users (id bigint primary key, user_name varchar(64) not null)")
+    execute("create unique index users_username on users(user_name)")
 
     execute("alter table photos add column user_id bigint not null default 0 after id")
 
@@ -41,7 +41,7 @@ class AddUsersTable < ActiveRecord::Migration[6.0]
     execute("create index photos_time_id on photos(time_id desc, feature_threshold desc)")
     execute("create index photos_time on photos(time desc,feature_threshold desc)")
     execute("create index photos_loc_gis on photos(location_longitude, location_latitude, time_id, feature_threshold desc)")
-    execute("alter table users drop column user_id")
+    execute("alter table photos drop column user_id")
 
     execute("drop table users")
   end

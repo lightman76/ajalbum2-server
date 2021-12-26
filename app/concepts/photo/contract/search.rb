@@ -5,6 +5,7 @@ module Photo::Contract
   class Search < Reform::Form
     MAX_TARGET_MAX_RESULTS = 500
 
+    property :user
     property :search_text
     property :start_date #ISO date - this is the general search date limit
     property :end_date #ISO date - this is the general search date limit

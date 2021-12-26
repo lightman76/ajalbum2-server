@@ -1,6 +1,6 @@
 require_relative "../contract/retrieve_tags_by_id"
 
-class Tag::Operation::RetrieveTagsById < BaseOperation
+class Tag::Operation::RetrieveTagsById < ::BaseOperation
   step Model(OpenStruct, :new)
   step Contract::Build(constant: ::Tag::Contract::RetrieveTagsById)
   step Contract::Validate()

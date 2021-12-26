@@ -1,10 +1,11 @@
 require_relative "../contract/search"
 
-class Photo::Operation::DateOutlineSearch < BaseOperation
+class Photo::Operation::DateOutlineSearch < ::BaseOperation
   step Model(OpenStruct, :new)
   step Contract::Build(constant: ::Photo::Contract::DateOutlineSearch)
   step Contract::Validate(key: :search)
   step :sync_to_model
+  step :hydrate_user
   step :extra_sanity_checks
   step :process_date_params
   step :search!
@@ -37,9 +38,10 @@ class Photo::Operation::DateOutlineSearch < BaseOperation
     true
   end
 
-  def search!(options, model:, **)
+  def search!(options, model:, user:, **)
     #query_chain = ::Photo.group('date(time)')
     query_chain = ::Photo.group("TIMESTAMPADD(MINUTE,#{-1 * model.timezone_offset_min},date(CONVERT_TZ(time,'+00:00','#{format_zone_offset(model.timezone_offset_min)}')))")
+    query_chain.where(user_id: user.id)
     query_chain = query_chain.where(["MATCH(title, description, location_name) AGAINST (?)", model.search_text]) if model.search_text
     query_chain = query_chain.where(["time >= ?", model.start_date]) if model.start_date
     query_chain = query_chain.where(["time < ?", model.offset_date]) #always use offset date
