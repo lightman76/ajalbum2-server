@@ -1,6 +1,6 @@
 require_relative "../contract/search_tags"
 
-class Tag::Operation::SearchTags < BaseOperation
+class Tag::Operation::SearchTags < ::BaseOperation
   step Model(OpenStruct, :new)
   step Contract::Build(constant: ::Tag::Contract::SearchTags)
   step Contract::Validate(key: :search)

@@ -1,10 +1,12 @@
 require_relative "../contract/bulk_import_json"
 
-class Photo::BulkImportJson < Trailblazer::Operation
+class Photo::BulkImportJson < ::BaseOperation
   step Model(OpenStruct, :new)
   step Contract::Build(constant: ::Photo::Contract::BulkImportJson)
   step Contract::Validate()
   step :process_params
+  step :sync_to_model
+  step :hydrate_user
   step :process_json
 
   def process_params(options, params:, **)
@@ -16,24 +18,25 @@ class Photo::BulkImportJson < Trailblazer::Operation
     true
   end
 
-  def process_json(options, json_data:, **)
+  def process_json(options, json_data:, user:, **)
     json_data["photos"].each do |jp|
       from_orig_location = jp["from_original_file_path"]
       file_in = File.open(File.join(options[:import_photo_root], from_orig_location))
       parsed_date = DateTime.iso8601(jp["taken_timestamp"])
 
       result = ::Photo::Operation::Create.(params: {
-          photo: {
-              image_stream: file_in,
-              original_file_name: jp["original_file_name"],
-              original_content_type: jp["original_content_type"],
-              time: parsed_date,
-              title: jp["title"],
-              taken_in_tz: jp["taken_in_tz"],
-              location_latitude: jp["location_latitude"],
-              location_longitude: jp["location_longitude"],
-              location_name: jp["location_name"],
-              source_name: jp["source_name"],
+        photo: {
+          user: user,
+          image_stream: file_in,
+          original_file_name: jp["original_file_name"],
+          original_content_type: jp["original_content_type"],
+          time: parsed_date,
+          title: jp["title"],
+          taken_in_tz: jp["taken_in_tz"],
+          location_latitude: jp["location_latitude"],
+          location_longitude: jp["location_longitude"],
+          location_name: jp["location_name"],
+          source_name: jp["source_name"],
               description: jp["description"],
               tag_names: jp["tag_names"],
               tag_people: jp["tag_people"],

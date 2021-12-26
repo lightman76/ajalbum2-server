@@ -1,7 +1,7 @@
 require_relative "../contract/create"
 require 'fileutils'
 
-class Photo::Operation::Create < Trailblazer::Operation
+class Photo::Operation::Create < ::BaseOperation
 
   step Model(Photo, :new)
   step Contract::Build(constant: ::Photo::Contract::Create)
@@ -23,10 +23,13 @@ class Photo::Operation::Create < Trailblazer::Operation
   #Load the image metadata
   step :load_image_metadata
 
+  step :hydrate_user_params
+
   #now handle populating other "computed" fields and merging in overrides
   step :populate_time_id
   step :populate_source_id
   step :populate_feature_threshold
+  step :populate_user
   step :populate_title
   step :populate_location
   step :record_metadata
@@ -170,6 +173,11 @@ class Photo::Operation::Create < Trailblazer::Operation
         original_metadata[:original_content_type] = photo[:original_content_type] = "image/jpeg"
       end
     end
+    true
+  end
+
+  def populate_user(options, user:, **)
+    model.user = user
     true
   end
 

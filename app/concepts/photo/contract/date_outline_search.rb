@@ -5,6 +5,7 @@ module Photo::Contract
   class DateOutlineSearch < Reform::Form
     MAX_DAY_RESULTS = 365 * 2
 
+    property :user
     property :search_text
     property :start_date #ISO date - this is the general search date limit
     property :end_date #ISO date - this is the general search date limit

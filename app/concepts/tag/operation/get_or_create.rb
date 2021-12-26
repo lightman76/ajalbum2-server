@@ -1,10 +1,11 @@
 require_relative "../contract/get_or_create"
 
-class Tag::GetOrCreate < Trailblazer::Operation
+class Tag::GetOrCreate < ::BaseOperation
   step Model(Tag, :new)
   step Contract::Build(constant: ::Tag::Contract::GetOrCreate)
   step Contract::Validate(key: :tag)
   step :process_params
+  step :hydrate_user_param
   step :find_or_create_tag
 
   def process_params(options, params:, **)
@@ -12,8 +13,8 @@ class Tag::GetOrCreate < Trailblazer::Operation
     true
   end
 
-  def find_or_create_tag(options, f:, model:, **)
-    tag = ::Tag.where(tag_type: f[:tag_type], name: f[:name]).first
+  def find_or_create_tag(options, f:, model:, user:, **)
+    tag = ::Tag.where(user_id: user.id, tag_type: f[:tag_type], name: f[:name]).first
     if tag
       #found existing
       model = options[:model] = tag

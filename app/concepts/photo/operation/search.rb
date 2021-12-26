@@ -1,10 +1,11 @@
 require_relative "../contract/search"
 
-class Photo::Operation::Search < Trailblazer::Operation
+class Photo::Operation::Search < ::BaseOperation
   step Model(OpenStruct, :new)
   step Contract::Build(constant: ::Photo::Contract::Search)
   step Contract::Validate(key: :search)
   step :sync_to_model
+  step :hydrate_user
   step :process_date_params
   step :process_paging_params
   step :search!
@@ -42,9 +43,10 @@ class Photo::Operation::Search < Trailblazer::Operation
     true
   end
 
-  def search!(options, model:, **)
+  def search!(options, model:, user:, **)
     query_chain = ::Photo
     query_chain = query_chain.where(["MATCH(title, description, location_name) AGAINST (?)", model.search_text]) if model.search_text
+    query_chain.where(user_id: user.id)
     query_chain = query_chain.where(["time >= ?", model.start_date]) if model.start_date
     query_chain = query_chain.where(["time < ?", model.offset_date]) #always have offset date
     query_chain = query_chain.where(["feature_threshold >= ?", model.min_threshold]) if model.min_threshold

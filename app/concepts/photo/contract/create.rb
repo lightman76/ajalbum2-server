@@ -5,7 +5,7 @@ require "reform/form/dry"
 module Photo::Contract
   class Create < Reform::Form
     include Dry
-
+    property :user
     property :image_stream, virtual: true #must provide a stream with the image data
     property :original_file_name, virtual: true #when loading images from files, we likely won't be specifying a title, so we can fallback to the original file name
     property :original_content_type, virtual: true #If image comes from a stream, we may not be easily able to find it's content type so specify here
