@@ -2,7 +2,10 @@ require 'rails_helper'
 
 RSpec.describe Photo::Operation::Create do
   before :each do
-    op = ::Source::Create.(params: {source: {raw_name: 'unknown', display_name: 'Unknown'}})
+    uop = ::User::Operation::CreateUser.(params: { user: { user_name: 'George' } })
+    @user = uop["user"]
+
+    op = ::Source::Create.(params: { raw_name: 'unknown', display_name: 'Unknown', user: @user })
     expect(op).to be_success
     @test1jpg = File.open(File.join(Rails.root, "spec", "test_files", "test_file1.jpg"))
   end
@@ -14,7 +17,7 @@ RSpec.describe Photo::Operation::Create do
 
   it "should create generated images" do
     t = DateTime.now
-    params = {"photo": {"image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown', "original_file_name": "test1.jpg"}}
+    params = { "photo": { "image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown', "original_file_name": "test1.jpg", user: @user } }
     result = ::Photo::Operation::Create.(params: params)
     expect(result).to be_success
     expect(result["model"]).not_to be_nil
@@ -55,7 +58,7 @@ RSpec.describe Photo::Operation::Create do
 
     it "should create a photo record with correct metadata" do
       t = DateTime.now
-      params = {"photo": {"image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown'}}
+      params = { "photo": { "image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown', user: @user } }
       result = ::Photo::Operation::Create.(params: params)
       expect(result).to be_success
       expect(result["model"]).not_to be_nil
@@ -74,7 +77,7 @@ RSpec.describe Photo::Operation::Create do
 
     it "should create general tag" do
       t = DateTime.now
-      params = {"photo": {"image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown', tag_names: ["nature"], feature_threshold: 10}}
+      params = { "photo": { "image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown', tag_names: ["nature"], feature_threshold: 10, user: @user } }
       result = ::Photo::Operation::Create.(params: params)
       expect(result).to be_success
       expect(result["model"]).not_to be_nil
@@ -92,7 +95,7 @@ RSpec.describe Photo::Operation::Create do
 
     it "should create person tag" do
       t = DateTime.now
-      params = {"photo": {"image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown', tag_people: ["George Washington"], feature_threshold: nil}}
+      params = { "photo": { "image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown', tag_people: ["George Washington"], feature_threshold: nil, user: @user } }
       result = ::Photo::Operation::Create.(params: params)
       expect(result).to be_success
       expect(result["model"]).not_to be_nil
@@ -106,7 +109,7 @@ RSpec.describe Photo::Operation::Create do
 
     it "should create event tag" do
       t = DateTime.now
-      params = {"photo": {"image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown', tag_events: ["Washington DC Trip"]}}
+      params = { "photo": { "image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown', tag_events: ["Washington DC Trip"], user: @user } }
       result = ::Photo::Operation::Create.(params: params)
       expect(result).to be_success
       expect(result["model"]).not_to be_nil
@@ -120,7 +123,7 @@ RSpec.describe Photo::Operation::Create do
 
     it "should create location tag" do
       t = DateTime.now
-      params = {"photo": {"image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown', tag_locations: ["Home Base"]}}
+      params = { "photo": { "image_stream": @test1jpg, "time": t, "title": "Test Photo", source_name: 'unknown', tag_locations: ["Home Base"], user: @user } }
       result = ::Photo::Operation::Create.(params: params)
       expect(result).to be_success
       expect(result["model"]).not_to be_nil

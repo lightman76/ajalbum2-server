@@ -11,12 +11,24 @@ class BaseOperation < Trailblazer::Operation
   end
 
   def hydrate_user_param(options, params:, **)
-    params[:user] = User.where(user_name: params[:user]).first if params[:user].class == String
-    params[:user] = User.where(id: params[:user]).first if params[:user].class == Integer
-    options[:user] = params[:user]
-    unless params[:user]
+    user = params[:user]
+    key = nil
+    if !user && params.keys.length > 0
+      key = params.keys.first
+      user = params[key][:user]
+    end
+    user = User.where(user_name: user).first if user.class == String
+    user = User.where(id: user).first if user.class == Integer
+    options[:user] = user
+    unless user
       add_error(options, :user, "Unknown user")
       return false
+    end
+    if params[:user]
+      params[:user] = user
+    end
+    if key
+      params[key][:user] = user
     end
     true
   end
