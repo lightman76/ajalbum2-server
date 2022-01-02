@@ -5,7 +5,10 @@ RSpec.describe ::Photo::Operation::Search do
 
   context "Basic tests" do
     before :each do
-      op = ::Source::Create.(params: {source: {raw_name: 'unknown', display_name: 'Unknown'}})
+      op = ::User::Operation::CreateUser.(params: { user: { user_name: "fred" } })
+      @user = op[:user]
+
+      op = ::Source::Create.(params: { raw_name: 'unknown', display_name: 'Unknown', user: @user })
       expect(op).to be_success
       source_id = op[:model].id
       #manually create a set of a few photos in the database to test on (without creating files)
@@ -20,7 +23,8 @@ RSpec.describe ::Photo::Operation::Search do
                            metadata: {},
                            tags: {},
                            feature_threshold: 1,
-                           image_versions: {}
+                           image_versions: {},
+                           user: @user,
       )
       expect(@p1.id).not_to be_nil
       @p2t = DateTime.now - 5.years
@@ -34,7 +38,8 @@ RSpec.describe ::Photo::Operation::Search do
                            metadata: {},
                            tags: {},
                            feature_threshold: 2,
-                           image_versions: {}
+                           image_versions: {},
+                           user: @user,
       )
       @p3t = DateTime.now - 2.years
       @p3 = ::Photo.create(:title => "Golden Gate Bridge",
@@ -47,7 +52,8 @@ RSpec.describe ::Photo::Operation::Search do
                            metadata: {},
                            tags: {},
                            feature_threshold: 0,
-                           image_versions: {}
+                           image_versions: {},
+                           user: @user,
       )
       @p4t = DateTime.now - 7.years
       @p4 = ::Photo.create(:title => "Yosemite Valley",
@@ -60,12 +66,13 @@ RSpec.describe ::Photo::Operation::Search do
                            metadata: {},
                            tags: {},
                            feature_threshold: 0,
-                           image_versions: {}
+                           image_versions: {},
+                           user: @user,
       )
     end
 
     it "should return correct results for no filter" do
-      result = ::Photo::Operation::Search.(params: {search: {}})
+      result = ::Photo::Operation::Search.(params: { search: { user: @user, } })
       expect(result.success?).to be_truthy
       results = result["results"]
       expect(results).not_to be_nil
@@ -78,7 +85,7 @@ RSpec.describe ::Photo::Operation::Search do
     end
 
     it "should return correct results for pagination" do
-      result = ::Photo::Operation::Search.(params: {search: {offset_date: @p1t - 1.years + 1.day, target_max_results: 2}})
+      result = ::Photo::Operation::Search.(params: { search: { user: @user, offset_date: @p1t - 1.years + 1.day, target_max_results: 2 } })
       expect(result.success?).to be_truthy
       results = result["results"]
       expect(results).not_to be_nil
@@ -89,7 +96,7 @@ RSpec.describe ::Photo::Operation::Search do
     end
 
     it "should return correct next_offset_date for pagination" do
-      result = ::Photo::Operation::Search.(params: {search: {target_max_results: 2}})
+      result = ::Photo::Operation::Search.(params: { search: { user: @user, target_max_results: 2 } })
       expect(result.success?).to be_truthy
       results = result["results"]
       expect(results).not_to be_nil
@@ -102,7 +109,7 @@ RSpec.describe ::Photo::Operation::Search do
       expect(results[0].id).to eq(@p1.id)
       expect(results[1].id).to eq(@p3.id)
 
-      result = ::Photo::Operation::Search.(params: {search: {offset_date: next_offset, target_max_results: 2}})
+      result = ::Photo::Operation::Search.(params: { search: { user: @user, offset_date: next_offset, target_max_results: 2 } })
       expect(result.success?).to be_truthy
       results = result["results"]
       expect(results).not_to be_nil
@@ -113,7 +120,7 @@ RSpec.describe ::Photo::Operation::Search do
     end
 
     it "should return correct results for start_date filter" do
-      result = ::Photo::Operation::Search.(params: {search: {start_date: JSON.parse((DateTime.now - 3.years).to_json)}})
+      result = ::Photo::Operation::Search.(params: { search: { user: @user, start_date: JSON.parse((DateTime.now - 3.years).to_json) } })
       expect(result.success?).to be_truthy
       results = result["results"]
       expect(results).not_to be_nil
@@ -123,7 +130,7 @@ RSpec.describe ::Photo::Operation::Search do
       expect(results[1].id).to eq(@p3.id)
     end
     it "should return correct results for end_date filter" do
-      result = ::Photo::Operation::Search.(params: {search: {end_date: JSON.parse((DateTime.now - 3.years).to_json)}})
+      result = ::Photo::Operation::Search.(params: { search: { user: @user, end_date: JSON.parse((DateTime.now - 3.years).to_json) } })
       expect(result.success?).to be_truthy
       results = result["results"]
       expect(results).not_to be_nil
@@ -134,7 +141,7 @@ RSpec.describe ::Photo::Operation::Search do
     end
 
     it "should return correct results for both date filters" do
-      result = ::Photo::Operation::Search.(params: {search: {start_date: JSON.parse((DateTime.now - 6.years).to_json), end_date: JSON.parse((DateTime.now - 1.years).to_json)}})
+      result = ::Photo::Operation::Search.(params: { search: { user: @user, start_date: JSON.parse((DateTime.now - 6.years).to_json), end_date: JSON.parse((DateTime.now - 1.years).to_json) } })
       expect(result.success?).to be_truthy
       results = result["results"]
       expect(results).not_to be_nil
@@ -144,7 +151,7 @@ RSpec.describe ::Photo::Operation::Search do
       expect(results[1].id).to eq(@p2.id)
     end
     it "should return correct results for min_threshold" do
-      result = ::Photo::Operation::Search.(params: {search: {min_threshold: 1}})
+      result = ::Photo::Operation::Search.(params: { search: { user: @user, min_threshold: 1 } })
       expect(result.success?).to be_truthy
       results = result["results"]
       expect(results).not_to be_nil
@@ -154,7 +161,7 @@ RSpec.describe ::Photo::Operation::Search do
       expect(results[1].id).to eq(@p2.id)
     end
     it "should return correct results for max_threshold" do
-      result = ::Photo::Operation::Search.(params: {search: {max_threshold: 1}})
+      result = ::Photo::Operation::Search.(params: { search: { user: @user, max_threshold: 1 } })
       expect(result.success?).to be_truthy
       results = result["results"]
       expect(results).not_to be_nil
@@ -180,10 +187,10 @@ RSpec.describe ::Photo::Operation::Search do
 
     context "tags: " do
       before :each do
-        @ttag1 = ::Tag::GetOrCreate.(params: {tag: {tag_type: "tag", name: "TestTag1"}})["tag"]
-        @ttag2 = ::Tag::GetOrCreate.(params: {tag: {tag_type: "tag", name: "TestTag2"}})["tag"]
-        @ptag1 = ::Tag::GetOrCreate.(params: {tag: {tag_type: "person", name: "Ronald McDonald"}})["tag"]
-        @ptag2 = ::Tag::GetOrCreate.(params: {tag: {tag_type: "person", name: "Roy Rodgers"}})["tag"]
+        @ttag1 = ::Tag::GetOrCreate.(params: { tag: { user: @user, tag_type: "tag", name: "TestTag1" } })["tag"]
+        @ttag2 = ::Tag::GetOrCreate.(params: { tag: { user: @user, tag_type: "tag", name: "TestTag2" } })["tag"]
+        @ptag1 = ::Tag::GetOrCreate.(params: { tag: { user: @user, tag_type: "person", name: "Ronald McDonald" } })["tag"]
+        @ptag2 = ::Tag::GetOrCreate.(params: { tag: { user: @user, tag_type: "person", name: "Roy Rodgers" } })["tag"]
 
         #TODO: use an operation to do this so it's added to the tags JSON on the photo too
         PhotoTag.create(photo_id: @p1.id, tag_id: @ttag1.id, time_id: @p1.time_id)
@@ -194,7 +201,7 @@ RSpec.describe ::Photo::Operation::Search do
       end
 
       it "should find photos for tag tag1" do
-        result = ::Photo::Operation::Search.(params: {search: {tags: [@ttag1.id]}})
+        result = ::Photo::Operation::Search.(params: { search: { user: @user, tags: [@ttag1.id] } })
         expect(result.success?).to be_truthy
         results = result["results"]
         expect(results).not_to be_nil
@@ -205,7 +212,7 @@ RSpec.describe ::Photo::Operation::Search do
       end
 
       it "should find photos for person tag1" do
-        result = ::Photo::Operation::Search.(params: {search: {tags: [@ptag1.id]}})
+        result = ::Photo::Operation::Search.(params: { search: { user: @user, tags: [@ptag1.id] } })
         expect(result.success?).to be_truthy
         results = result["results"]
         expect(results).not_to be_nil

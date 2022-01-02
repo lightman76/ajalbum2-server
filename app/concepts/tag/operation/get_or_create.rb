@@ -3,9 +3,9 @@ require_relative "../contract/get_or_create"
 class Tag::GetOrCreate < ::BaseOperation
   step Model(Tag, :new)
   step Contract::Build(constant: ::Tag::Contract::GetOrCreate)
-  step Contract::Validate(key: :tag)
   step :process_params
   step :hydrate_user_param
+  step Contract::Validate(key: :tag)
   step :find_or_create_tag
 
   def process_params(options, params:, **)
@@ -21,7 +21,7 @@ class Tag::GetOrCreate < ::BaseOperation
     else
       #create new tag
       # TODO: ensure we don't set properties that don't make sense based on the current type (eg location shouldn't have event date, person shouldn't have location, etc)
-      options["contract.default"].sync()
+      options[:"contract.default"].sync()
       model.save!
       tag = model
     end

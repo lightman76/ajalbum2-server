@@ -87,7 +87,7 @@ class Photo::Operation::Create < ::BaseOperation
     true
   end
 
-  def process_tags(options, model:, params:, **)
+  def process_tags(options, model:, params:, user:, **)
     photo = params[:photo]
     tags = []
     if photo[:tag_ids]
@@ -96,11 +96,11 @@ class Photo::Operation::Create < ::BaseOperation
         tags << tag if tag
       end
     end
-    process_tag_type('tag', photo[:tag_names], tags) #eg nature, cute kids
-    process_tag_type('people', photo[:tag_people], tags)
-    process_tag_type('event', photo[:tag_events], tags, timestamp: model.time) #eg Yosemite trip
-    process_tag_type('location', photo[:tag_locations], tags, lat: model.location_latitude, long: model.location_longitude) # eg Paris
-    process_tag_type('album', photo[:tag_albums], tags) #this will be just the album name.  Will need a separate process to export album details and import that to add/update the tags with the additional album details
+    process_tag_type(user, 'tag', photo[:tag_names], tags) #eg nature, cute kids
+    process_tag_type(user, 'people', photo[:tag_people], tags)
+    process_tag_type(user, 'event', photo[:tag_events], tags, timestamp: model.time) #eg Yosemite trip
+    process_tag_type(user, 'location', photo[:tag_locations], tags, lat: model.location_latitude, long: model.location_longitude) # eg Paris
+    process_tag_type(user, 'album', photo[:tag_albums], tags) #this will be just the album name.  Will need a separate process to export album details and import that to add/update the tags with the additional album details
     model.tags['tags'] = tags
     #materialize these tags as photo_tags
     tags.each do |tag_id|
@@ -109,11 +109,11 @@ class Photo::Operation::Create < ::BaseOperation
     true
   end
 
-  def process_tag_type(tag_type, names, tags, lat: nil, long: nil, timestamp: nil)
+  def process_tag_type(user, tag_type, names, tags, lat: nil, long: nil, timestamp: nil)
     if names
       names.uniq!
       names.each do |name|
-        result = ::Tag::GetOrCreate.(params: {tag: {tag_type: tag_type, name: name, location_latitude: lat, location_longitude: long, event_date: timestamp}})
+        result = ::Tag::GetOrCreate.(params: { tag: { tag_type: tag_type, name: name, location_latitude: lat, location_longitude: long, event_date: timestamp, user: user } })
         tags << result["tag"].id if result.success?
       end
     end
@@ -176,7 +176,7 @@ class Photo::Operation::Create < ::BaseOperation
     true
   end
 
-  def populate_user(options, user:, **)
+  def populate_user(options, model:, user:, **)
     model.user = user
     true
   end
@@ -314,7 +314,7 @@ class Photo::Operation::Create < ::BaseOperation
     nil
   end
 
-  def populate_source_id(options, params:, model:, **)
+  def populate_source_id(options, params:, model:, user:, **)
     photo = params[:photo]
     #TODO: default this to coming from metadata and overriding with this parameter
     raw_name = photo[:source_name]
@@ -325,7 +325,7 @@ class Photo::Operation::Create < ::BaseOperation
       model.source_id = src.id
     else
       #default the display name to the raw name.  Can allow users to alter these to more friendly names later
-      op = ::Source::Create.(params: {source: {raw_name: raw_name, display_name: raw_name}})
+      op = ::Source::Create.(params: { raw_name: raw_name, display_name: raw_name, user: user })
       src = op[:model]
       model.source_name = src.display_name
       model.source_id = src.id

@@ -4,7 +4,10 @@ RSpec.describe ::Photo::Operation::DateOutlineSearch do
 
   context "Basic tests" do
     before :each do
-      op = ::Source::Create.(params: {source: {raw_name: 'unknown', display_name: 'Unknown'}})
+      uop = ::User::Operation::CreateUser.(params: { user: { user_name: 'George' } })
+      @user = uop["user"]
+
+      op = ::Source::Create.(params: { raw_name: 'unknown', display_name: 'Unknown', user: @user })
       expect(op).to be_success
       @source_id = source_id = op[:model].id
       #manually create a set of a few photos in the database to test on (without creating files)
@@ -19,7 +22,8 @@ RSpec.describe ::Photo::Operation::DateOutlineSearch do
                            metadata: {},
                            tags: {},
                            feature_threshold: 1,
-                           image_versions: {}
+                           image_versions: {},
+                           user: @user
       )
       expect(@p1.id).not_to be_nil
       @p2t = DateTime.now - 5.years
@@ -33,7 +37,8 @@ RSpec.describe ::Photo::Operation::DateOutlineSearch do
                            metadata: {},
                            tags: {},
                            feature_threshold: 2,
-                           image_versions: {}
+                           image_versions: {},
+                           user: @user
       )
       @p3t = DateTime.now - 2.years
       @p3 = ::Photo.create(:title => "Golden Gate Bridge",
@@ -46,7 +51,8 @@ RSpec.describe ::Photo::Operation::DateOutlineSearch do
                            metadata: {},
                            tags: {},
                            feature_threshold: 0,
-                           image_versions: {}
+                           image_versions: {},
+                           user: @user
       )
       @p4t = DateTime.now - 7.years
       @p4 = ::Photo.create(:title => "Yosemite Valley",
@@ -59,7 +65,8 @@ RSpec.describe ::Photo::Operation::DateOutlineSearch do
                            metadata: {},
                            tags: {},
                            feature_threshold: 0,
-                           image_versions: {}
+                           image_versions: {},
+                           user: @user
       )
     end
 
@@ -68,7 +75,7 @@ RSpec.describe ::Photo::Operation::DateOutlineSearch do
     end
 
     it "should return correct results for no filter" do
-      result = ::Photo::Operation::DateOutlineSearch.(params: { search: { timezone_offset_min: -5 * 60 } })
+      result = ::Photo::Operation::DateOutlineSearch.(params: { search: { timezone_offset_min: -5 * 60, user: 'George' } })
       expect(result.success?).to be_truthy
       results_by_date = result["result_count_by_date"]
       expect(results_by_date).not_to be_nil
@@ -96,10 +103,11 @@ RSpec.describe ::Photo::Operation::DateOutlineSearch do
                           metadata: {},
                           tags: {},
                           feature_threshold: 0,
-                          image_versions: {}
+                          image_versions: {},
+                          user: @user
       )
 
-      result = ::Photo::Operation::DateOutlineSearch.(params: { search: { timezone_offset_min: -5 * 60 } })
+      result = ::Photo::Operation::DateOutlineSearch.(params: { search: { timezone_offset_min: -5 * 60, user: 'George' } })
       expect(result.success?).to be_truthy
       results_by_date = result["result_count_by_date"]
       expect(results_by_date).not_to be_nil
