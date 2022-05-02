@@ -1,7 +1,7 @@
 class BaseOperation < Trailblazer::Operation
 
   def hydrate_user(options, model:, **)
-    model.user = User.where(user_name: model.user).first if model.user.class == String
+    model.user = User.where(username: model.user).first if model.user.class == String
     options[:user] = model.user
     unless model.user
       add_error(options, :user, "Unknown user")
@@ -17,7 +17,7 @@ class BaseOperation < Trailblazer::Operation
       key = params.keys.first
       user = params[key][:user]
     end
-    user = User.where(user_name: user).first if user.class == String
+    user = User.where(username: user).first if user.class == String
     user = User.where(id: user).first if user.class == Integer
     options[:user] = user
     unless user
