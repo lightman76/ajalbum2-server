@@ -19,6 +19,14 @@ module Api
           render json: { matching_tags: result["matching_tags"] }.to_json
           return
         end
+        render_api_validation_error(result, "Tag search failed:")
+      end
+
+      def retrieve_all_tags
+        if result = ::Tag::Operation::RetrieveAllTags.(params: { user: params[:user_name] })
+          render json: { all_tags: result["all_tags"] }.to_json
+          return
+        end
         render_api_validation_error(result, "Tag retrieval failed:")
       end
 
