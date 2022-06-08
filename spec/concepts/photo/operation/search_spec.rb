@@ -5,7 +5,7 @@ RSpec.describe ::Photo::Operation::Search do
 
   context "Basic tests" do
     before :each do
-      op = ::User::Operation::CreateUser.(params: { user: { user_name: "fred" } })
+      op = ::User::Operation::CreateUser.(params: { user: { username: "fred" } })
       @user = op[:user]
 
       op = ::Source::Create.(params: { raw_name: 'unknown', display_name: 'Unknown', user: @user })

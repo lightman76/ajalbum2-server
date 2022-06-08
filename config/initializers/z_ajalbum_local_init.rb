@@ -30,6 +30,10 @@ FileUtils.mkdir_p(APP_CONFIG["photo_storage"]["tmp_upload_path"])
 FileUtils.mkdir_p(APP_CONFIG["photo_storage"]["originals_path"])
 FileUtils.mkdir_p(APP_CONFIG["photo_storage"]["generated_images_path"])
 
+APP_CONFIG["jwt"] = {} unless APP_CONFIG["jwt"]
+APP_CONFIG["jwt"]["keys"] = {} unless APP_CONFIG["jwt"]["keys"]
+# https://stackoverflow.com/questions/33960565/how-to-generate-a-hs512-secret-key-to-use-with-jwt
+APP_CONFIG["jwt"]["keys"]["auth-hmac512"] = 'xy8qOZJe/F+/t8CjnoNQqbnSADWMG3+RbuO8nPhT6NmBlafjiZVyp61Ij3WCM5tR1jj4/NcA6f4EMcrgVnP9WZ+htKikNxLkR7CyN6Ie+df2uV1CgbVpsXaAKJWK64kGqdAwBxR/oqYXoXLQ7fI2hWoUkCrH7qjFRj6ZMcyB//gTmogCMrZ+3EIiOc3C3QsdcjbGyG0saNTlZppM1DJbX+1wZyknBGOSploNHg==' unless APP_CONFIG["jwt"]["keys"]["auth-hmac512"]
 
 APP_CONFIG["defaults"] = {} unless APP_CONFIG["defaults"]
 # default to the current timezone.  For normal cameras, we probably set its to our local timezone.

@@ -42,4 +42,13 @@ class BaseOperation < Trailblazer::Operation
     options["contract.default"].errors.add(field, message)
   end
 
+  def self.human_string_from_op_errors(op)
+    strs = []
+    details = op['contract.default'].errors.details
+    details.each_key do |k|
+      strs << "#{k}: #{details[k].collect { |e| e[:error] }.join(" ")}; "
+    end
+    return strs.join(" ")
+  end
+
 end

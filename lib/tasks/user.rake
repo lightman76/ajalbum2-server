@@ -14,4 +14,17 @@ namespace :user do
   task :add_user, [:user_name] => :environment do |t, args|
     raise "NOT IMPLEMENTED"
   end
+
+  desc 'Set password for user'
+  task :set_password, [:user_name, :password] => :environment do |t, args|
+    raise "Must specify username" unless args.user_name
+    raise "Must specify password" unless args.password
+
+    op = ::User::Operation::CreatePassword.(params: { user: args.user_name, new_password: args.password })
+    unless op.success?
+      puts "Failed to set password: #{op['contract.default'].errors.inspect}"
+      raise "Failed"
+    end
+    puts "Successfully set password for #{args.user_name}"
+  end
 end

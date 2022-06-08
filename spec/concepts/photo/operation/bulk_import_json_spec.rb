@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Photo::Operation::Create do
   before :each do
-    uop = ::User::Operation::CreateUser.(params: { user: { user_name: 'George' } })
+    uop = ::User::Operation::CreateUser.(params: { user: { username: 'George' } })
     @user = uop["user"]
 
     ##
