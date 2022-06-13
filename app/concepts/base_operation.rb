@@ -33,6 +33,35 @@ class BaseOperation < Trailblazer::Operation
     true
   end
 
+  def validate_authorization_to_access_user(options, model:, user:, **)
+    raw_token = model.authorization
+    unless raw_token
+      add_error(options, :authorization, "Missing authorization for this operation.")
+      return false
+    end
+
+    tok_data = JWT.decode(raw_token, APP_CONFIG["jwt"]["keys"]["auth-hmac512"], true, { algorithms: ['HS512'] })
+    acting_user = tok_data[0]['sub']
+    unless tok_data[0]['aud'] == "AJAlbumServer" && tok_data[0]['iss'] == "AJAlbumServer"
+      add_error(options, :authorization, "Invalid authorization.")
+      return false
+    end
+    exp_date_num = tok_data[0]['exp']
+    exp_time = Time.at(exp_date_num)
+    unless exp_time > Time.now
+      add_error(options, :authorization, "Authorization has expired.")
+      return false
+    end
+
+    #OK - Token looks good
+    # For now, users can only access their own albums.  In the future may add a lookup table to allow crossing between them
+    unless user.username == tok_data[0]['sub']
+      add_error(options, :authorization, "Authorization not valid for this user album.")
+      return false
+    end
+    return true
+  end
+
   def sync_to_model(options, model:, **)
     options["contract.default"].sync
     true
