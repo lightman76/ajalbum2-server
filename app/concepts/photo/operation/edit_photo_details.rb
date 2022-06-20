@@ -10,9 +10,9 @@ class Photo::Operation::EditPhotoDetails < ::BaseOperation
   step :save_updates
 
   def hydrate_photos(options, model:, **)
-    photos = model.photo_ids.collect { |pid| Photo.get(pid) }.compact
+    photos = model.photo_time_ids.collect { |pid| Photo.where(time_id: pid).first }.compact
     unless photos.length > 0
-      add_error(options, :photo_ids, "Selected photos not found.")
+      add_error(options, :photo_time_ids, "Selected photos not found.")
       return false
     end
     options[:photos] = photos
