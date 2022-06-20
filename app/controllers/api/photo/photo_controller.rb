@@ -33,13 +33,13 @@ class Api::Photo::PhotoController < ApplicationController
 
   def update_photos
     update_params = JSON.parse(request.body.read)
-    update_params['authorization'] = headers['Authorization'].sub("Bearer ", "")
+    update_params['authorization'] = request.headers['Authorization'] ? request.headers['Authorization'].sub("Bearer ", "") : nil
     update_params['user'] = params[:user]
     op = ::Photo::Operation::EditPhotoDetails.(params: update_params)
     if op.success?
       render json: { update_count: op["update_cnt"] }.to_json
       return
     end
-    render_api_validation_error(result, "Update failed:")
+    render_api_validation_error(op, "Update failed:")
   end
 end

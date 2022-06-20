@@ -3,7 +3,7 @@ require "reform"
 class Photo::Contract::EditPhotoDetails < Reform::Form
   property :authorization
   property :user #This is the user whose photos will be edited (only if the authorization allows)
-  property :photo_ids #array to allow bulk editing
+  property :photo_time_ids #array to allow bulk editing
 
   #The following fields will be updated if present and not null
   property :updated_title
@@ -21,7 +21,7 @@ class Photo::Contract::EditPhotoDetails < Reform::Form
     params do
       required(:authorization).filled
       required(:user).filled
-      required(:photo_ids).filled
+      required(:photo_time_ids).filled
     end
   end
 

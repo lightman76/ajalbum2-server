@@ -10,7 +10,7 @@ class Api::User::UserController < ApplicationController
       render json: { token: op[:token] }.to_json
       return
     end
-    render_api_validation_error(result, "User authentication failed. ")
+    render_api_validation_error(op, "User authentication failed. ")
   end
 
 end

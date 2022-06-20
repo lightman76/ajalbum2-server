@@ -86,7 +86,7 @@ RSpec.describe ::Photo::Operation::EditPhotoDetails do
       op = ::Photo::Operation::EditPhotoDetails.(params: {
         authorization: @authorization,
         user: "fred",
-        photo_ids: [@p1.id, @p4.id],
+        photo_time_ids: [@p1.time_id, @p4.time_id],
         updated_title: "Beautiful landscapes",
         updated_description: "Sweeping vistas",
         updated_feature_threshold: 11,
@@ -122,7 +122,7 @@ RSpec.describe ::Photo::Operation::EditPhotoDetails do
       op = ::Photo::Operation::EditPhotoDetails.(params: {
         authorization: @authorization,
         user: "fred",
-        photo_ids: [@p1.id, @p4.id],
+        photo_time_ids: [@p1.time_id, @p4.time_id],
         updated_title: "Beautiful landscapes",
       })
       expect(op.success?).to be_truthy
@@ -151,7 +151,7 @@ RSpec.describe ::Photo::Operation::EditPhotoDetails do
       op = ::Photo::Operation::EditPhotoDetails.(params: {
         authorization: @authorization,
         user: "fred",
-        photo_ids: [@p1.id, @p4.id],
+        photo_time_ids: [@p1.time_id, @p4.time_id],
         updated_description: "Beautiful landscapes",
       })
       expect(op.success?).to be_truthy
@@ -176,7 +176,7 @@ RSpec.describe ::Photo::Operation::EditPhotoDetails do
       op = ::Photo::Operation::EditPhotoDetails.(params: {
         authorization: @authorization,
         user: "fred",
-        photo_ids: [@p1.id],
+        photo_time_ids: [@p1.time_id],
         add_tags: [@person_tag1]
       })
       expect(op.success?).to be_truthy
@@ -185,7 +185,7 @@ RSpec.describe ::Photo::Operation::EditPhotoDetails do
       op = ::Photo::Operation::EditPhotoDetails.(params: {
         authorization: @authorization,
         user: "fred",
-        photo_ids: [@p1.id, @p4.id],
+        photo_time_ids: [@p1.time_id, @p4.time_id],
         add_tags: [@person_tag1]
       })
       expect(op.success?).to be_truthy
@@ -207,7 +207,7 @@ RSpec.describe ::Photo::Operation::EditPhotoDetails do
       op = ::Photo::Operation::EditPhotoDetails.(params: {
         authorization: @authorization,
         user: "fred",
-        photo_ids: [@p1.id],
+        photo_time_ids: [@p1.time_id],
         add_tags: [@person_tag1]
       })
       expect(op.success?).to be_truthy
@@ -215,7 +215,7 @@ RSpec.describe ::Photo::Operation::EditPhotoDetails do
       op = ::Photo::Operation::EditPhotoDetails.(params: {
         authorization: @authorization,
         user: "fred",
-        photo_ids: [@p1.id, @p4.id],
+        photo_time_ids: [@p1.time_id, @p4.time_id],
         add_tags: [@tag1]
       })
       expect(op.success?).to be_truthy
@@ -224,7 +224,7 @@ RSpec.describe ::Photo::Operation::EditPhotoDetails do
       op = ::Photo::Operation::EditPhotoDetails.(params: {
         authorization: @authorization,
         user: "fred",
-        photo_ids: [@p1.id, @p4.id],
+        photo_time_ids: [@p1.time_id, @p4.time_id],
         remove_tags: [@person_tag1.id]
       })
       expect(op.success?).to be_truthy
