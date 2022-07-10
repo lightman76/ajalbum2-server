@@ -72,13 +72,13 @@ RSpec.describe ::Photo::Operation::EditPhotoDetails do
                            image_versions: {},
                            user: @user,
       )
-      op = ::Tag::GetOrCreate.(params: { "tag": { "user": "fred", "tag_type": "tag", "name": "Tag 1" } })
+      op = ::Tag::Operation::GetOrCreate.(params: { "tag": { "user": "fred", "tag_type": "tag", "name": "Tag 1" } })
       @tag1 = op["tag"]
-      op = ::Tag::GetOrCreate.(params: { "tag": { "user": "fred", "tag_type": "tag", "name": "Tag 2" } })
+      op = ::Tag::Operation::GetOrCreate.(params: { "tag": { "user": "fred", "tag_type": "tag", "name": "Tag 2" } })
       @tag2 = op["tag"]
-      op = ::Tag::GetOrCreate.(params: { "tag": { "user": "fred", "tag_type": "people", "name": "Person 1" } })
+      op = ::Tag::Operation::GetOrCreate.(params: { "tag": { "user": "fred", "tag_type": "people", "name": "Person 1" } })
       @person_tag1 = op["tag"]
-      op = ::Tag::GetOrCreate.(params: { "tag": { "user": "fred", "tag_type": "people", "name": "Person 2" } })
+      op = ::Tag::Operation::GetOrCreate.(params: { "tag": { "user": "fred", "tag_type": "people", "name": "Person 2" } })
       @person_tag2 = op["tag"]
     end
 

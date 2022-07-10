@@ -6,22 +6,22 @@ RSpec.describe ::Tag::Operation::RetrieveTagsById do
     @user = op[:user]
 
     params = { "tag": { "user": "fred", "tag_type": "tag", "name": "Test Tag 1" } }
-    result = ::Tag::GetOrCreate.(params: params)
+    result = ::Tag::Operation::GetOrCreate.(params: params)
     expect(result).to be_success
     @tag1 = result["tag"]
 
     params = { "tag": { "user": "fred", "tag_type": "tag", "name": "Test Tag 2" } }
-    result = ::Tag::GetOrCreate.(params: params)
+    result = ::Tag::Operation::GetOrCreate.(params: params)
     expect(result).to be_success
     @tag2 = result["tag"]
 
     params = { "tag": { "user": "fred", "tag_type": "people", "name": "John Doe" } }
-    result = ::Tag::GetOrCreate.(params: params)
+    result = ::Tag::Operation::GetOrCreate.(params: params)
     expect(result).to be_success
     @person_tag1 = result["tag"]
 
     params = { "tag": { "user": "fred", "tag_type": "people", "name": "Suzy Queue" } }
-    result = ::Tag::GetOrCreate.(params: params)
+    result = ::Tag::Operation::GetOrCreate.(params: params)
     expect(result).to be_success
     @person_tag2 = result["tag"]
   end

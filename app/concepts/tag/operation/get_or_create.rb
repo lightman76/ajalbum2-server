@@ -1,6 +1,6 @@
 require_relative "../contract/get_or_create"
 
-class Tag::GetOrCreate < ::BaseOperation
+class Tag::Operation::GetOrCreate < ::BaseOperation
   step Model(Tag, :new)
   step Contract::Build(constant: ::Tag::Contract::GetOrCreate)
   step :process_params
@@ -14,6 +14,7 @@ class Tag::GetOrCreate < ::BaseOperation
   end
 
   def find_or_create_tag(options, f:, model:, user:, **)
+    puts "Preparing to create tag #{f[:name]}"
     tag = ::Tag.where(user_id: user.id, tag_type: f[:tag_type], name: f[:name]).first
     if tag
       #found existing
@@ -29,5 +30,18 @@ class Tag::GetOrCreate < ::BaseOperation
     true
   end
 
+  class Endpoint < self
+    def process_params(options, params:, model:, **)
+      options[:f] = params[:tag]
+
+      #Validate API access
+      return false unless hydrate_user_param(options, params: params)
+      params[:tag]['user'] = options[:user]
+      return false unless validate_authorization_to_access_user(options, model: OpenStruct.new(authorization: params['authorization']), user: options[:user])
+
+      true
+    end
+
+  end
 
 end

@@ -4,14 +4,14 @@ class BaseOperation < Trailblazer::Operation
     model.user = User.where(username: model.user).first if model.user.class == String
     options[:user] = model.user
     unless model.user
-      add_error(options, :user, "Unknown user")
+      add_error(options, :user, "Unknown user (1)")
       return false
     end
     true
   end
 
   def hydrate_user_param(options, params:, **)
-    user = params[:user]
+    user = params[:user] || params["user"]
     key = nil
     if !user && params.keys.length > 0
       key = params.keys.first
@@ -21,10 +21,10 @@ class BaseOperation < Trailblazer::Operation
     user = User.where(id: user).first if user.class == Integer
     options[:user] = user
     unless user
-      add_error(options, :user, "Unknown user")
+      add_error(options, :user, "Unknown user (2)")
       return false
     end
-    if params[:user]
+    if params[:user] || params["user"]
       params[:user] = user
     end
     if key
