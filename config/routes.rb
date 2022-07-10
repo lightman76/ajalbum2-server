@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   put 'api/:user/photo' => 'api/photo/photo#update_photos'
 
   post 'api/tag/ids' => 'api/tag/tag#tags_by_id'
+  post 'api/:user_name/tag' => 'api/tag/tag#create_tag'
   get 'api/:user_name/tags' => 'api/tag/tag#retrieve_all_tags'
   post 'api/:user_name/tags' => 'api/tag/tag#search_tags'
 

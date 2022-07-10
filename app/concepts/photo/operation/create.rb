@@ -113,7 +113,7 @@ class Photo::Operation::Create < ::BaseOperation
     if names
       names.uniq!
       names.each do |name|
-        result = ::Tag::GetOrCreate.(params: { tag: { tag_type: tag_type, name: name, location_latitude: lat, location_longitude: long, event_date: timestamp, user: user } })
+        result = ::Tag::Operation::GetOrCreate.(params: { tag: { tag_type: tag_type, name: name, location_latitude: lat, location_longitude: long, event_date: timestamp, user: user } })
         tags << result["tag"].id if result.success?
       end
     end

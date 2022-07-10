@@ -187,10 +187,10 @@ RSpec.describe ::Photo::Operation::Search do
 
     context "tags: " do
       before :each do
-        @ttag1 = ::Tag::GetOrCreate.(params: { tag: { user: @user, tag_type: "tag", name: "TestTag1" } })["tag"]
-        @ttag2 = ::Tag::GetOrCreate.(params: { tag: { user: @user, tag_type: "tag", name: "TestTag2" } })["tag"]
-        @ptag1 = ::Tag::GetOrCreate.(params: { tag: { user: @user, tag_type: "person", name: "Ronald McDonald" } })["tag"]
-        @ptag2 = ::Tag::GetOrCreate.(params: { tag: { user: @user, tag_type: "person", name: "Roy Rodgers" } })["tag"]
+        @ttag1 = ::Tag::Operation::GetOrCreate.(params: { tag: { user: @user, tag_type: "tag", name: "TestTag1" } })["tag"]
+        @ttag2 = ::Tag::Operation::GetOrCreate.(params: { tag: { user: @user, tag_type: "tag", name: "TestTag2" } })["tag"]
+        @ptag1 = ::Tag::Operation::GetOrCreate.(params: { tag: { user: @user, tag_type: "person", name: "Ronald McDonald" } })["tag"]
+        @ptag2 = ::Tag::Operation::GetOrCreate.(params: { tag: { user: @user, tag_type: "person", name: "Roy Rodgers" } })["tag"]
 
         #TODO: use an operation to do this so it's added to the tags JSON on the photo too
         PhotoTag.create(photo_id: @p1.id, tag_id: @ttag1.id, time_id: @p1.time_id)
