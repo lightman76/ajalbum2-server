@@ -37,15 +37,15 @@ class Photo::BulkImportJson < ::BaseOperation
           location_longitude: jp["location_longitude"],
           location_name: jp["location_name"],
           source_name: jp["source_name"],
-              description: jp["description"],
-              tag_names: jp["tag_names"],
-              tag_people: jp["tag_people"],
-              tag_events: jp["tag_events"],
-              tag_locations: jp["tag_locations"],
-              tag_albums: jp["tag_albums"],
-              feature_threshold: jp["feature_threshold"],
-              autorotate: !options[:skip_autorotate]
-          }
+          description: jp["description"],
+          tag_names: jp["tag_names"],
+          tag_people: jp["tag_people"],
+          tag_events: jp["tag_events"],
+          tag_locations: jp["tag_locations"],
+          tag_albums: jp["tag_albums"],
+          feature_threshold: jp["feature_threshold"],
+          autorotate: !options[:skip_autorotate]
+        }
       })
       if result.success?
         options[:success_count] += 1
