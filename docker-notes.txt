@@ -1,0 +1,10 @@
+ajalbum-server-toolbox
+
+#Build a toolbox environment to access the docker version of rails
+docker build --platform linux/amd64 -t ajalbum-server-toolbox -f Dockerfile.rails .
+docker run --platform linux/amd64 -it --env-file .env -v $PWD:/opt/app ajalbum-server-toolbox
+
+#Build the actual server image
+docker build --platform linux/amd64 -t ajalbum-server -f Dockerfile .
+
+#run it docker run --platform linux/amd64 -it --env-file .env -p 8010:8010 -v $PWD:/opt/app ajalbum-server

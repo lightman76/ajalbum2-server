@@ -138,6 +138,7 @@ GEM
     i18n (1.8.11)
       concurrent-ruby (~> 1.0)
     jwt (2.3.0)
+    kgio (2.11.4)
     listen (3.1.5)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
@@ -204,6 +205,7 @@ GEM
       method_source
       rake (>= 0.8.7)
       thor (>= 0.20.3, < 2.0)
+    raindrops (0.20.0)
     rake (13.0.6)
     rb-fsevent (0.11.0)
     rb-inotify (0.10.1)
@@ -296,6 +298,9 @@ GEM
     tzinfo (1.2.9)
       thread_safe (~> 0.1)
     uber (0.1.0)
+    unicorn (6.1.0)
+      kgio (~> 2.6)
+      raindrops (~> 0.7)
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
@@ -333,6 +338,7 @@ DEPENDENCIES
   trailblazer (~> 2.1.0)
   trailblazer-rails (~> 2.1.7)
   tzinfo-data
+  unicorn (~> 6.1.0)
 
 RUBY VERSION
    ruby 2.5.5p157

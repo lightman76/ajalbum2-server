@@ -15,7 +15,7 @@ end
 
 # DO it here so that we can reference the user specific properties in the other config files
 path = File.expand_path('../../server_specific_config.yml', __FILE__)
-if File.exists?(path) && (user_config = YAML.load_file(path))
+if File.exists?(path) && (user_config = YAML.load_file(ERB.new(File.read(path)).result))
   APP_CONFIG.merge!(user_config)
 end
 
@@ -45,7 +45,7 @@ APP_CONFIG["defaults"]["timezone_offset_str"] = cur_zone_offset_str unless APP_C
 zone_offset_hour, zone_offset_min = APP_CONFIG["defaults"]["timezone_offset_str"].split(':')
 zone_offset_hour = zone_offset_hour.to_i
 zone_offset_min = zone_offset_min.to_i
-APP_CONFIG["defaults"]["timezone_offset"] = zone_offset_hour * 60 + (zone_offset_hour / (zone_offset_hour.abs)) * zone_offset_min
+APP_CONFIG["defaults"]["timezone_offset"] = zone_offset_hour * 60 + (zone_offset_hour.abs != 0 ? (zone_offset_hour / (zone_offset_hour.abs)) * zone_offset_min : 0)
 
 if APP_CONFIG["alternate_host1"]
   Rails.configuration.hosts << APP_CONFIG["alternate_host1"]
