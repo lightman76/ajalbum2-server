@@ -1,0 +1,8 @@
+DATABASE_HOSTNAME=localhost
+DATABASE_NAME=ajalbum2dev
+DATABASE_USERNAME=ajalbumdev
+DATABASE_PASSWORD=asdf1212
+PHOTO_STORAGE_PATH=/Users/delpha/myfiles/ajalbum-root
+HOSTNAME_ALT1=local.scrible.com
+WORKER_PROCESSES=1
+LISTEN_ON=0.0.0.0:8010
