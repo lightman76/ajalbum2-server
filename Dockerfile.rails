@@ -4,7 +4,9 @@ RUN apt-get install imagemagick
 
 #Default Directory
 ENV INSTALL_PATH /opt/app
+ENV PHOTO_STORAGE_PATH /opt/photo-storage
 RUN mkdir -p $INSTALL_PATH
+RUN mkdir -p $PHOTO_STORAGE_PATH
 
 
 #Install rails

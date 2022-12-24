@@ -15,9 +15,13 @@ end
 
 # DO it here so that we can reference the user specific properties in the other config files
 path = File.expand_path('../../server_specific_config.yml', __FILE__)
-if File.exists?(path) && (user_config = YAML.load_file(ERB.new(File.read(path)).result))
+file = File.read(path)
+processed_erb = ERB.new(file).result
+if File.exists?(path) && (user_config = YAML.load(processed_erb))
   APP_CONFIG.merge!(user_config)
 end
+
+puts "\n\n\nFINAL APP CONFIGURATION: #{APP_CONFIG.to_json}\n\n\n"
 
 APP_CONFIG["photo_storage"] = {} unless APP_CONFIG["photo_storage"]
 APP_CONFIG["photo_storage"]["root_path"] = "/tmp/ajalbum-root" unless APP_CONFIG["photo_storage"]["root_path"]

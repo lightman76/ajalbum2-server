@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  apiserver:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    volumes:
+      - photo-storage:/opt/photo-storage
+    ports:
+      - '8010:8010'
+    env_file:
+      - .env
+
+  nginx:
+    build:
+      context: ../ajalbum2-viewer
+      dockerfile: ./Dockerfile.nginx
+    links:
+      - apiserver
+    ports:
+      - '8020:8020'
+    volumes:
+      - "photo-storage:/opt/photo-storage"
+    env_file:
+      - .env
+
+volumes:
+  photo-storage:

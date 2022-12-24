@@ -8,3 +8,14 @@ docker run --platform linux/amd64 -it --env-file .env -v $PWD:/opt/app ajalbum-s
 docker build --platform linux/amd64 -t ajalbum-server -f Dockerfile .
 
 #run it docker run --platform linux/amd64 -it --env-file .env -p 8010:8010 -v $PWD:/opt/app ajalbum-server
+
+
+
+
+To access the docker managed volumes
+Run the following command to access the docker dir from the VM the MacOS version uses
+docker run --rm -it -v /var/lib/docker:/docker alpine:edge
+and find them in the vm under /docker/volumes
+
+For example to copy in the photos from my album on the local server to the docker image
+docker run --rm -it -v ajalbum2-server_photo-storage:/photo-storage -v /Users/delpha/myfiles/ajalbum-root:/photos alpine:edge
