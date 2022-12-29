@@ -13,7 +13,7 @@ class User::Operation::CreateUserToken < ::BaseOperation
     payload = {
       iat: issue_time.utc.to_i,
       token_val: SecureRandom.base64(32),
-      sub: user.username,
+      sub: user.user_name,
       exp: (issue_time + 7.days).utc.to_i,
       aud: 'AJAlbumServer',
       iss: 'AJAlbumServer'

@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe ::Tag::Operation::RetrieveTagsById do
   before :each do
-    op = ::User::Operation::CreateUser.(params: { user: { username: "fred" } })
+    op = ::User::Operation::CreateUser.(params: { user: { user_name: "fred" } })
     @user = op[:user]
 
     params = { "tag": { "user": "fred", "tag_type": "tag", "name": "Test Tag 1" } }

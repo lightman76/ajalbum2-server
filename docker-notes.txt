@@ -19,3 +19,9 @@ and find them in the vm under /docker/volumes
 
 For example to copy in the photos from my album on the local server to the docker image
 docker run --rm -it -v ajalbum2-server_photo-storage:/photo-storage -v /Users/delpha/myfiles/ajalbum-root:/photos alpine:edge
+
+To run a rails development on the bridge network for the album server use the following parameter
+--net ajalbum2-server_default
+
+run the busybox image to get telnet access
+docker run --platform linux/amd64 --net ajalbum2-server_default -it --env-file .env -v $PWD:/opt/app busybox sh
