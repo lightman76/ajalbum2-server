@@ -355,7 +355,7 @@ class Photo::Operation::Create < ::BaseOperation
       model.taken_in_tz = photo[:taken_in_tz] || original_metadata[:date_time_zone] || APP_CONFIG["defaults"]["timezone_offset"]
       return true
     end
-
+    add_error(options, :messages, "Could not determine timestamp for photo #{photo[:original_file_name]}")
     return false #must have a time id of some sort set for the image...  TODO: Could add an automatic timestamp.  Use a really old date range and find the max time in that range and then add one to the time ID
   end
 
