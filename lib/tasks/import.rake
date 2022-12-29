@@ -8,7 +8,7 @@ namespace :import do
         puts "Must specify a user_name to import as"
         raise "Missing user name"
       end
-      user = User.where(username: args.user_name).first
+      user = User.where(user_name: args.user_name).first
       unless user
         puts "Could not find user for #{args.user_name}"
         raise "Could not find user"

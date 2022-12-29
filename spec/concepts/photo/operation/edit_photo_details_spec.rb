@@ -5,7 +5,7 @@ RSpec.describe ::Photo::Operation::EditPhotoDetails do
 
   context "Basic tests" do
     before :each do
-      op = ::User::Operation::CreateUser.(params: { user: { username: "fred" } })
+      op = ::User::Operation::CreateUser.(params: { user: { user_name: "fred" } })
       @user = op[:user]
 
       op = ::User::Operation::CreateUserToken.(params: { user: 'fred' })

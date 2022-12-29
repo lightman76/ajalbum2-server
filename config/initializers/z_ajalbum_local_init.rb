@@ -22,6 +22,7 @@ if File.exists?(path) && (user_config = YAML.load(processed_erb))
 end
 
 puts "\n\n\nFINAL APP CONFIGURATION: #{APP_CONFIG.to_json}\n\n\n"
+puts "\n\n\nFINAL DB CONFIGURATION: #{ENV["DATABASE_HOSTNAME"]}---#{ENV["DATABASE_PORT"]}---#{ENV["DATABASE_NAME"]}\n\n\n"
 
 APP_CONFIG["photo_storage"] = {} unless APP_CONFIG["photo_storage"]
 APP_CONFIG["photo_storage"]["root_path"] = "/tmp/ajalbum-root" unless APP_CONFIG["photo_storage"]["root_path"]

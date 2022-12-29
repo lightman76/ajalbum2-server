@@ -2,7 +2,7 @@ require 'rails_helper'
 #
 RSpec.describe ::User::Operation::CreatePassword do
   before :each do
-    op = ::User::Operation::CreateUser.(params: { user: { username: "fred" } })
+    op = ::User::Operation::CreateUser.(params: { user: { user_name: "fred" } })
     expect(op.success?).to be_truthy
     @user = op["user"]
   end

@@ -5,7 +5,7 @@ namespace :user do
   task :create_default, [:user_name] => :environment do |t, args|
     un = args.user_name
     un = 'default' unless args.user_name
-    u = User.connection.execute("insert into users values (0,'#{un}')")
+    u = User.connection.execute("insert into users values (0,'#{un}', now(), now())")
     puts "Created user #{args.user_name} with id 0"
     #TODO: later user an operation to set this up properly and possibly change id
   end

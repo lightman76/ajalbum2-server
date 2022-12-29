@@ -30,5 +30,5 @@ RUN mkdir -p tmp
 
 RUN bundle install
 
-#Run a shell
+CMD rake db:migrate
 CMD bundle exec unicorn -c config/unicorn.rb

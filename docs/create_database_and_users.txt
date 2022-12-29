@@ -1,0 +1,4 @@
+create database ajalbum2dev;
+
+GRANT SELECT,INSERT,DELETE,UPDATE,CREATE,DROP,ALTER,INDEX  ON ajalbum2dev.* TO ajalbumdev@'%' IDENTIFIED BY 'asdf1212';
+GRANT SELECT,INSERT,DELETE,UPDATE,CREATE,DROP,ALTER,INDEX  ON ajalbum2dev.* TO ajalbumdev@'localhost' IDENTIFIED BY 'asdf1212';
