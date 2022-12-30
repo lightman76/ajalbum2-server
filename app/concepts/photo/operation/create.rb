@@ -259,6 +259,7 @@ class Photo::Operation::Create < ::BaseOperation
     data_ifd0 = exif_data[:ifd0] if exif_data && exif_data[:ifd0]
     if data_ifd0
       metadata[:date_time], metadata[:date_time_zone] = parse_exif_timestamp(data_ifd0[:time_stamp], metadata[:gps_timestamp])
+      metadata[:date_time], metadata[:date_time_zone] = parse_exif_timestamp(data_ifd0[:date_time], metadata[:gps_timestamp]) unless metadata[:date_time]
       metadata[:device_name] = "#{data_ifd0[:make]} #{data_ifd0[:model]}".strip
       metadata[:orientation] = data_ifd0[:orientation]
     end
