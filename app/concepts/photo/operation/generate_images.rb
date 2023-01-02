@@ -72,7 +72,7 @@ class Photo::Operation::GenerateImages < ::BaseOperation
       # -colorspace sRGB
       # -strip
       # ~/tmp/thumb-test.jpg
-      MiniMagick::Tool::Convert.new do |convert|
+      status = MiniMagick::Tool::Convert.new do |convert|
         convert << original_file_path
         convert.merge! ["-auto-orient"] if autorotate
         convert.merge! ["-filter", "Triangle",
@@ -91,6 +91,7 @@ class Photo::Operation::GenerateImages < ::BaseOperation
                        ]
         convert << variant_full_path
       end
+      Rails.logger.info("  Resize Thumbnail: Returned #{status.inspect}")
       true
     end
   end

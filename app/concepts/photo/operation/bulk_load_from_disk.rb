@@ -37,7 +37,11 @@ class Photo::Operation::BulkLoadFromDisk < ::BaseOperation
 
         if op.success?
           success_count += 1
-          puts "    Successfully imported #{file_path}"
+          if op[:warnings] && op[:warnings].length > 0
+            puts "    Errors while importing #{file_path}: #{op[:warnings].to_json}"
+          else
+            puts "    Successfully imported #{file_path}"
+          end
         else
           puts "  !!Failed to import #{file_path} #{human_string_from_op_errors(op)}"
           error_count += 1
