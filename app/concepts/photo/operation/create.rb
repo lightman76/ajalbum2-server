@@ -50,12 +50,21 @@ class Photo::Operation::Create < ::BaseOperation
 
   def process_image(options, model:, **)
     #TODO: call operation that generates images from the original
-    op_thumb = ::Photo::Operation::GenerateImages::Thumbnail.(params: {photo_model: model, autorotate: options["params"][:autorotate]})
-    options[:warnings] << "Failed to create thumbnail: #{op_thumb.errors.details.to_json}" unless op_thumb.success?
-    op_hd = ::Photo::Operation::GenerateImages::ScreenHd.(params: {photo_model: model, autorotate: options["params"][:autorotate]})
-    options[:warnings] << "Failed to create ScreenHD: #{op_hd.errors.details.to_json}" unless op_hd.success?
-    op_full = ::Photo::Operation::GenerateImages::FullRes.(params: {photo_model: model, autorotate: options["params"][:autorotate]})
-    options[:warnings] << "Failed to create FullRes: #{op_full.errors.details.to_json}" unless op_full.success?
+    op_thumb = ::Photo::Operation::GenerateImages::Thumbnail.(params: { photo_model: model, autorotate: options["params"][:autorotate] })
+    unless op_thumb.success?
+      Rails.logger.warn("Failed to create thumbnail: #{op_thumb.errors.details.to_json}")
+      options[:warnings] << "Failed to create thumbnail: #{op_thumb.errors.details.to_json}"
+    end
+    op_hd = ::Photo::Operation::GenerateImages::ScreenHd.(params: { photo_model: model, autorotate: options["params"][:autorotate] })
+    unless op_hd.success?
+      Rails.logger.warn("Failed to create ScreenHD: #{op_hd.errors.details.to_json}")
+      options[:warnings] << "Failed to create ScreenHD: #{op_hd.errors.details.to_json}"
+    end
+    op_full = ::Photo::Operation::GenerateImages::FullRes.(params: { photo_model: model, autorotate: options["params"][:autorotate] })
+    unless op_full.success?
+      Rails.logger.warn("Failed to create FullRes: #{op_full.errors.details.to_json}")
+      options[:warnings] << "Failed to create FullRes: #{op_full.errors.details.to_json}"
+    end
     model.save!
     true
   end
@@ -82,6 +91,7 @@ class Photo::Operation::Create < ::BaseOperation
         "content_type": model.metadata["original_content_type"],
         "retry_cnt": retry_cnt
     }
+    Rails.logger.info("  Copied original for #{tmp_file_path} to #{full_path}")
     options[:original_file_path] = full_path
     options[:original_retry_cnt] = retry_cnt
     true
