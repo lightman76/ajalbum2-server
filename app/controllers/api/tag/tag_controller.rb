@@ -15,7 +15,7 @@ module Api
       end
 
       def search_tags
-        if result = ::Tag::Operation::SearchTags.(params: { search: { search_text: params[:search_text] } })
+        if result = ::Tag::Operation::SearchTags.(params: { search: { user: params[:user_name], search_text: params[:search_text] } })
           render json: { matching_tags: result["matching_tags"] }.to_json
           return
         end

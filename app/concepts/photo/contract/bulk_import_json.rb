@@ -8,10 +8,12 @@ module Photo::Contract
     property :skip_autorotate, virtual: true
     property :import_photo_root
 
-    validation do
-      required(:user_name).filled
-      required(:json_data).filled
-      required(:import_photo_root).filled
+    validation name: :default do
+      params do
+        required(:user_name).filled
+        required(:json_data).filled
+        required(:import_photo_root).filled
+      end
     end
 
   end
