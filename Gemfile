@@ -25,6 +25,7 @@ gem 'reform-rails', '~>0.2.3'
 gem 'roar'
 gem 'multi_json'
 gem 'mimemagic','~>0.3.9'
+gem 'jwt'
 
 #Gem to read EXIF (aka jpeg) metadata - IMPORTANT: Requires libexif/libexif-devel to be installed locally
 gem 'exif', "~>2.2.0"

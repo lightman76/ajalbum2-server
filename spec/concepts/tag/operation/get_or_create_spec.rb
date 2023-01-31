@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Tag::GetOrCreate do
 
   before :each do
-    op = ::User::Operation::CreateUser.(params: { user: { user_name: "fred" } })
+    op = ::User::Operation::CreateUser.(params: { user: { username: "fred" } })
     @user = op[:user]
   end
 

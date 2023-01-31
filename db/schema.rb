@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_10_17_025908) do
+ActiveRecord::Schema.define(version: 2022_06_05_052013) do
 
   create_table "idgentable", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "next_value"
@@ -75,8 +75,20 @@ ActiveRecord::Schema.define(version: 2021_10_17_025908) do
     t.index ["user_id", "tag_type", "name"], name: "tag_type_name"
   end
 
+  create_table "user_authentications", id: :bigint, default: nil, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.integer "auth_type", default: 0, null: false
+    t.timestamp "created_at"
+    t.timestamp "updated_at"
+    t.string "external_identifier"
+    t.text "authentication_data", size: :medium
+    t.index ["user_id", "auth_type"], name: "user_authentications_by_user"
+  end
+
   create_table "users", id: :bigint, default: nil, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "username", limit: 64, null: false
+    t.timestamp "created_at"
+    t.timestamp "update_at"
     t.index ["username"], name: "users_username", unique: true
   end
 

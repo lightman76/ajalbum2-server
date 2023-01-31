@@ -1,11 +1,12 @@
 require "reform"
 require 'dry-validation'
-class User::Contract::CreateUser < Reform::Form
-  property :username
+
+class User::Contract::CreateUserToken < Reform::Form
+  property :user
 
   validation name: :default do
     params do
-      required(:username).filled
+      required(:user).filled
     end
   end
 end

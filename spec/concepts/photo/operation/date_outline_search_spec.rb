@@ -4,7 +4,7 @@ RSpec.describe ::Photo::Operation::DateOutlineSearch do
 
   context "Basic tests" do
     before :each do
-      uop = ::User::Operation::CreateUser.(params: { user: { user_name: 'George' } })
+      uop = ::User::Operation::CreateUser.(params: { user: { username: 'George' } })
       @user = uop["user"]
 
       op = ::Source::Create.(params: { raw_name: 'unknown', display_name: 'Unknown', user: @user })

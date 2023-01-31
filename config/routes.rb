@@ -10,4 +10,6 @@ Rails.application.routes.draw do
   get 'api/:user_name/tags' => 'api/tag/tag#retrieve_all_tags'
   post 'api/:user_name/tags' => 'api/tag/tag#search_tags'
 
+  post 'api/:user_name/authenticate' => 'api/user/user#authenticate'
+
 end
