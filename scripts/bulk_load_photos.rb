@@ -13,7 +13,7 @@ require 'optparse'
 class BulkLoadPhotos
 
   class BulkLoadPhotosOptions
-    attr_accessor :username, :locations, :events, :general_tags, :albums, :threshold
+    attr_accessor :username, :locations, :events, :general_tags, :albums, :threshold, :autorotate
 
     def initialize
       @verbose = false
@@ -22,6 +22,7 @@ class BulkLoadPhotos
       @general_tags = []
       @albums = []
       @threshold = 0
+      @autorotate = true
     end
 
     def define_options(parser)
@@ -35,6 +36,7 @@ class BulkLoadPhotos
       general_tag_option(parser)
       album_option(parser)
       threshold_option(parser)
+      autorotate_option(parser)
 
       parser.separator ""
       parser.separator "Common options:"
@@ -89,6 +91,13 @@ class BulkLoadPhotos
       end
     end
 
+    def autorotate_option(parser)
+      parser.on("-R", "--auto-rotate (true|false)",
+                "Auto-rotate photos based on metadata.  true OR false") do |autorotate|
+        self.autorotate = autorotate == "true" || autorotate == true
+      end
+    end
+
   end
 
   def parse(args)
@@ -111,17 +120,18 @@ class BulkLoadPhotos
     end
     relative_file_names = @args.default_argv
     puts "Preparing to process #{relative_file_names.length} files"
-    puts "Using parameters user=#{options.username} tags=#{options.general_tags}, location=#{options.locations}, event=#{options.events}, album=#{options.albums}, threshold=#{options.threshold}"
+    puts "Using parameters user=#{options.username} tags=#{options.general_tags}, location=#{options.locations}, event=#{options.events}, album=#{options.albums}, threshold=#{options.threshold}, autorotate=#{options.autorotate}"
 
     op = Photo::Operation::BulkLoadFromDisk.(params:
       {
         user: options.username,
-        file_list: relative_file_names, #TODO: do I need to convert these to a full path?
+        file_list: relative_file_names, # TODO: do I need to convert these to a full path?
         location_tags: options.locations,
         event_tags: options.events,
         general_tags: options.general_tags,
         album_tags: options.albums,
-        feature_threshold: options.threshold
+        feature_threshold: options.threshold,
+        autorotate: options.autorotate
       })
     if op.success?
       puts "Import successfully completed"

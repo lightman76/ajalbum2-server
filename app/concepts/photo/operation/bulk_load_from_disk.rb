@@ -31,7 +31,8 @@ class Photo::Operation::BulkLoadFromDisk < ::BaseOperation
             tag_events: model.event_tags,
             tag_locations: model.location_tags,
             tag_albums: model.album_tags,
-            feature_threshold: model.feature_threshold
+            feature_threshold: model.feature_threshold,
+            autorotate: model.autorotate || true
           }
         })
 

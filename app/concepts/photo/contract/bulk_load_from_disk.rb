@@ -8,6 +8,7 @@ class Photo::Contract::BulkLoadFromDisk < Reform::Form
   property :general_tags
   property :album_tags
   property :feature_threshold
+  property :autorotate
 
   validation name: :default do
     params do
