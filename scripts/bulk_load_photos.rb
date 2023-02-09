@@ -1,10 +1,12 @@
 #!/usr/bin/env ruby
 
-#Load the rails environment
+# Load the rails environment
 require File.expand_path("../../config/environment", __FILE__)
 
-#TODO use normal command line options to deal with a glob to find the files to process
+# TODO use normal command line options to deal with a glob to find the files to process
 # and call the operations to load them
+
+# EXAMPLE: scripts/bulk_load_photos.rb --u andy -v "Christmas 2022" /new-photos/blahblah/*.JPG
 
 require 'optparse'
 
