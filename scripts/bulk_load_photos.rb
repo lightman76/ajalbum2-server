@@ -95,6 +95,7 @@ class BulkLoadPhotos
       parser.on("-R", "--auto-rotate (true|false)",
                 "Auto-rotate photos based on metadata.  true OR false") do |autorotate|
         self.autorotate = autorotate == "true" || autorotate == true
+        puts "\n\n AutoRotate flag processed to #{self.autorotate}\n\n"
       end
     end
 

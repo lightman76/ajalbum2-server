@@ -17,8 +17,8 @@ services:
 
   apiserver:
     build:
-      context: .
-      dockerfile: ./Dockerfile
+      context: ./
+      dockerfile: ./Dockerfile.rails-server
     volumes:
       - photo-storage:/opt/photo-storage
     ports:

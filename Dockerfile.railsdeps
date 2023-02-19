@@ -1,6 +1,5 @@
 #Dockerfile.rails
-FROM ruby:2.5.5 AS ajalbum-server-toolbox
-RUN apt-get install imagemagick
+FROM ajalbum-rails-imagemagick AS ajalbum-server-deps
 
 #Default Directory
 ENV INSTALL_PATH /opt/app
@@ -13,9 +12,10 @@ RUN mkdir -p $PHOTO_STORAGE_PATH
 RUN gem install bundler -v 1.17.3
 RUN gem install nokogiri -v 1.12.5
 WORKDIR /opt/app
+RUN mkdir -p log
+RUN mkdir -p tmp
 COPY Gemfile Gemfile
 COPY Gemfile.lock Gemfile.lock
+
 RUN bundle install
 
-#Run a shell
-CMD ["/bin/bash"]

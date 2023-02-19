@@ -1,11 +1,18 @@
 ajalbum-server-toolbox
 
+#Build some base layers to avoid constant rebuilds of things that don't change often
+#Add imagemagick to the rails image
+docker build --platform linux/amd64 -t ajalbum-rails-imagemagick -f Dockerfile.rails-imagemagick .
+
+#Now add our gem dependencies
+docker build --platform linux/amd64 -t ajalbum-server-deps -f Dockerfile.railsdeps .
+
 #Build a toolbox environment to access the docker version of rails
-docker build --platform linux/amd64 -t ajalbum-server-toolbox -f Dockerfile.rails .
+docker build --platform linux/amd64 -t ajalbum-server-toolbox -f Dockerfile.rails-toolbox .
 docker run --platform linux/amd64 -it --env-file .env -v $PWD:/opt/app ajalbum-server-toolbox
 
 #Build the actual server image
-docker build --platform linux/amd64 -t ajalbum-server -f Dockerfile .
+docker build --platform linux/amd64 -t ajalbum-server -f Dockerfile.rails-server .
 
 #run it docker run --platform linux/amd64 -it --env-file .env -p 8010:8010 -v $PWD:/opt/app ajalbum-server
 

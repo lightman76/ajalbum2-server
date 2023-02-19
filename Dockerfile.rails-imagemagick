@@ -1,0 +1,13 @@
+#Dockerfile.rails
+FROM ruby:2.5.5 AS ajalbum-rails-imagemagick
+
+#Default Directory
+ENV SRC_PATH /opt/src
+RUN mkdir -p $SRC_PATH
+
+WORKDIR /opt/src
+COPY installImagemagick7.sh installImagemagick7.sh
+RUN chmod 755 installImagemagick7.sh
+RUN ./installImagemagick7.sh
+
+

@@ -19,7 +19,7 @@ class Photo::Operation::BulkLoadFromDisk < ::BaseOperation
         content_type = "image/png" if /.png$/i.match(file_path)
         #TODO: Add other types as needed
 
-        puts "  Processing #{file_path} at #{DateTime.now}"
+        puts "  Processing #{file_path} at #{DateTime.now} - autorotate=#{model.autorotate}"
         op = ::Photo::Operation::Create.(params: {
           photo: {
             user: user,
@@ -32,7 +32,7 @@ class Photo::Operation::BulkLoadFromDisk < ::BaseOperation
             tag_locations: model.location_tags,
             tag_albums: model.album_tags,
             feature_threshold: model.feature_threshold,
-            autorotate: model.autorotate || true
+            autorotate: model.autorotate
           }
         })
 

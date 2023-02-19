@@ -1,0 +1,9 @@
+#Dockerfile.rails
+FROM lisp:5000/ajalbum-server-deps AS ajalbum-server-toolbox
+
+#Default Directory
+ENV INSTALL_PATH /opt/app
+ENV PHOTO_STORAGE_PATH /opt/photo-storage
+
+#Run a shell
+CMD ["/bin/bash"]

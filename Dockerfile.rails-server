@@ -1,0 +1,19 @@
+#Dockerfile.rails
+FROM lisp:5000/ajalbum-server-deps AS ajalbum-server
+
+#Default Directory
+ENV INSTALL_PATH /opt/app
+ENV PHOTO_STORAGE_PATH /opt/photo-storage
+
+COPY app app
+COPY bin bin
+COPY config config
+COPY db db
+COPY lib lib
+COPY public public
+COPY vendor vendor
+COPY config.ru config.ru
+COPY Rakefile Rakefile
+
+CMD rake db:migrate
+CMD bundle exec unicorn -c config/unicorn.rb
