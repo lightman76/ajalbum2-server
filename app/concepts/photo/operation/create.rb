@@ -198,6 +198,8 @@ class Photo::Operation::Create < ::BaseOperation
     tmp_file_path = File.join(tmp_dir, "upload_#{Process.pid}_#{Time.now.to_i}.jpg")
     File.open(tmp_file_path, 'w') do |fh|
       IO.copy_stream(photo[:image_stream], fh)
+      fh.flush
+      fh.close
     end
 
     options[:tmp_file_path] = tmp_file_path
@@ -248,7 +250,12 @@ class Photo::Operation::Create < ::BaseOperation
     # Synthetic: will populate this elsewhere from the import process
     #   original_file_name
     #   original_content_type
-    exif_data = Exif::Data.new(IO.read(tmp_file_path))
+    begin
+      exif_data = Exif::Data.new(IO.read(tmp_file_path))
+    rescue
+      # seems we're getting errors for some of the older scanned images (at least those, maybe others, but haven't tried yet), so just ignore these errors
+      Rails.logger.warn("    Failed to extract EXIF metadata from #{tmp_file_path}")
+    end
 
     metadata = {}
 
