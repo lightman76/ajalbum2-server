@@ -158,7 +158,7 @@ class Photo::Operation::GenerateImages < ::BaseOperation
       # -strip
       # ~/Downloads/testPeru1b.jpg
       MiniMagick::Tool::Convert.new do |convert|
-        puts "\n\n Running convert with autorotate=#{autorotate} on #{original_file_path}\n\n"
+        # puts "\n\n Running convert with autorotate=#{autorotate} on #{original_file_path}\n\n"
         convert << original_file_path
         convert.merge! ["-auto-orient"] if autorotate
         convert.merge! ["-filter", "Triangle",
