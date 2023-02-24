@@ -43,8 +43,8 @@ class Photo::Operation::DateOutlineSearch < ::BaseOperation
     query_chain = ::Photo.group("TIMESTAMPADD(MINUTE,#{-1 * model.timezone_offset_min},date(CONVERT_TZ(time,'+00:00','#{format_zone_offset(model.timezone_offset_min)}')))")
     query_chain.where(user_id: user.id)
     query_chain = query_chain.where(["MATCH(title, description, location_name) AGAINST (?)", model.search_text]) if model.search_text
-    query_chain = query_chain.where(["time_id >= ?", model.start_date.to_i]) if model.start_date
-    query_chain = query_chain.where(["time_id < ?", model.offset_date.to_i]) # always use offset date
+    query_chain = query_chain.where(["time_id >= ?", model.start_date.to_i * 1000]) if model.start_date
+    query_chain = query_chain.where(["time_id < ?", model.offset_date.to_i * 1000]) # always use offset date
     query_chain = query_chain.where(["feature_threshold >= ?", model.min_threshold]) if model.min_threshold
     query_chain = query_chain.where(["feature_threshold <= ?", model.max_threshold]) if model.max_threshold
     if model.tags && model.tags.length > 0
