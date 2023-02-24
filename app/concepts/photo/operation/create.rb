@@ -96,7 +96,7 @@ class Photo::Operation::Create < ::BaseOperation
     options[:original_file_path] = full_path
     options[:original_retry_cnt] = retry_cnt
     if retry_cnt
-      model.time_id = time.to_i * 1000 + (retry_cnt + 1) # this should be in milliseconds
+      model.time_id = model.time_id + (retry_cnt + 1) # this should be in milliseconds
       model.save!
     end
     true
@@ -373,6 +373,7 @@ class Photo::Operation::Create < ::BaseOperation
 
     time = photo[:time] if photo[:time] #if time metadata overridden
     if time
+      options[:time] = time
       model.time = time
       model.time_id = time.to_i * 1000 #this should be in milliseconds
       model.taken_in_tz = photo[:taken_in_tz] || original_metadata[:date_time_zone] || APP_CONFIG["defaults"]["timezone_offset"]

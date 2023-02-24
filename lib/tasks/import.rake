@@ -2,6 +2,10 @@ require 'json'
 
 namespace :import do
   desc 'Load a batch of photos from a JSON file'
+=begin
+Example call
+rake import:json[andy,/new-photos/1976-1990.json,/new-photos/,true]
+=end
   task :json, [:user_name, :json_file, :import_photo_root, :skip_autorotate] => :environment do |t, args|
     File.open(args.json_file) do |fh|
       unless args.user_name
