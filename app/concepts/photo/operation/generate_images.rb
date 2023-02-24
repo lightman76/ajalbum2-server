@@ -26,7 +26,7 @@ class Photo::Operation::GenerateImages < ::BaseOperation
       "root_store": "generated",
       "relative_path": variant_relative_path,
       "content_type": "image/jpeg",
-      "retry_cnt": original_retry_cnt,
+      "retry_count": original_retry_cnt,
       "version": 1,
       "width": @width,
       "height": @height,

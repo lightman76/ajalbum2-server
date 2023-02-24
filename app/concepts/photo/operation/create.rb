@@ -86,10 +86,11 @@ class Photo::Operation::Create < ::BaseOperation
     FileUtils.cp(tmp_file_path, full_path)
     #now store it in the image_versions
     model.image_versions['original'] = {
-        "root_store": "originals",
-        "relative_path": File.join(PhotoUtils.base_path_for_photo(model), PhotoUtils.file_name_for_photo(model, retry_cnt: retry_cnt)),
-        "content_type": model.metadata["original_content_type"],
-        "retry_cnt": retry_cnt
+      "root_store": "originals",
+      "relative_path": File.join(PhotoUtils.base_path_for_photo(model), PhotoUtils.file_name_for_photo(model, retry_cnt: retry_cnt)),
+      "retry_count": retry_cnt,
+      "content_type": model.metadata["original_content_type"],
+      "retry_cnt": retry_cnt
     }
     Rails.logger.info("  Copied original for #{tmp_file_path} to #{full_path}")
     options[:original_file_path] = full_path
