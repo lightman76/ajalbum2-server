@@ -21,7 +21,9 @@ class Photo::BulkImportJson < ::BaseOperation
   def process_json(options, json_data:, user:, **)
     json_data["photos"].each do |jp|
       from_orig_location = jp["from_original_file_path"]
-      file_in = File.open(File.join(options[:import_photo_root], from_orig_location))
+      full_path_file = File.join(options[:import_photo_root], from_orig_location)
+      puts "Bulk Import from file #{full_path_file} - exists? #{File.exist?(full_path_file)}"
+      file_in = File.open(full_path_file)
       parsed_date = DateTime.iso8601(jp["taken_timestamp"])
 
       result = ::Photo::Operation::Create.(params: {
