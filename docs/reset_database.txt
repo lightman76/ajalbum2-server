@@ -5,3 +5,7 @@ truncate table photo_tags;
 truncate table photos;
 truncate table sources;
 truncate table tags;
+
+
+# THEN CLEAR PHOTO cache
+rm -rf /opt/photo-storage/generated/*  /opt/photo-storage/originals/* /opt/photo-storage/tmp_upload/upload_*

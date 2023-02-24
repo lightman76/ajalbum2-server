@@ -95,6 +95,10 @@ class Photo::Operation::Create < ::BaseOperation
     Rails.logger.info("  Copied original for #{tmp_file_path} to #{full_path}")
     options[:original_file_path] = full_path
     options[:original_retry_cnt] = retry_cnt
+    if retry_cnt
+      model.time_id = time.to_i * 1000 + (retry_cnt + 1) # this should be in milliseconds
+      model.save!
+    end
     true
   end
 
