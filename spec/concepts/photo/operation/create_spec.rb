@@ -2,6 +2,8 @@ require 'rails_helper'
 
 RSpec.describe Photo::Operation::Create do
   before :each do
+    APP_CONFIG["defaults"]["timezone_offset_str"] = "-05:00"
+    APP_CONFIG["defaults"]["timezone_offset"] = -300
     uop = ::User::Operation::CreateUser.(params: { user: { user_name: 'George' } })
     @user = uop["user"]
 

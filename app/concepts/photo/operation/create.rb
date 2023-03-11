@@ -375,8 +375,13 @@ class Photo::Operation::Create < ::BaseOperation
     if time
       options[:time] = time
       model.time = time
-      model.time_id = time.to_i * 1000 #this should be in milliseconds
-      model.taken_in_tz = photo[:taken_in_tz] || original_metadata[:date_time_zone] || APP_CONFIG["defaults"]["timezone_offset"]
+      model.time_id = time.to_i * 1000 # this should be in milliseconds
+      model.taken_in_tz = photo[:taken_in_tz] || (original_metadata[:date_time_zone] ? original_metadata[:date_time_zone].to_f * 60 : nil) || APP_CONFIG["defaults"]["timezone_offset"]
+
+      # Now assign the date bucket that will be used for the photo - take the time + the difference in the timezone it was taken in and the current timezone
+      # Trying to get to the time in the location the photo was taken and using that date as a consistent date (ignoring time zones, DST changes, etc)
+      date_bucket_d = time.dup + (model.taken_in_tz - APP_CONFIG["defaults"]["timezone_offset"]).minutes
+      model.date_bucket = date_bucket_d.strftime("%Y%m%d").to_i
       return true
     end
     add_error(options, :messages, "Could not determine timestamp for photo #{photo[:original_file_name]}")

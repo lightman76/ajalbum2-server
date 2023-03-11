@@ -26,25 +26,16 @@ class Photo::Operation::DateOutlineSearch < ::BaseOperation
     if model.end_date
       model.end_date = DateTime.iso8601(model.end_date)
     end
-    model.timezone_offset_min = nil unless model.timezone_offset_min.class == Integer
-    model.timezone_offset_min = 0 unless !model.timezone_offset_min.nil?
-    if model.timezone_offset_min
-      #TODO: cache this somehow?
-      time_zone = ActiveSupport::TimeZone.all.detect do |zone|
-        zone.now.utc_offset == model.timezone_offset_min * 60
-      end
-      Time.zone = time_zone
-    end
     true
   end
 
   def search!(options, model:, user:, **)
     # query_chain = ::Photo.group('date(time)')
-    query_chain = ::Photo.group("TIMESTAMPADD(MINUTE,#{-1 * model.timezone_offset_min},date(CONVERT_TZ(time,'+00:00','#{format_zone_offset(model.timezone_offset_min)}')))")
+    query_chain = ::Photo.group(:date_bucket)
     query_chain.where(user_id: user.id)
     query_chain = query_chain.where(["MATCH(title, description, location_name) AGAINST (?)", model.search_text]) if model.search_text
-    query_chain = query_chain.where(["time >= ?", model.start_date]) if model.start_date
-    query_chain = query_chain.where(["time < ?", model.offset_date]) # always use offset date
+    query_chain = query_chain.where(["date_bucket >= ?", model.start_date.strftime("%Y%m%d").to_i]) if model.start_date
+    query_chain = query_chain.where(["date_bucket < ?", model.offset_date.strftime("%Y%m%d").to_i]) # always use offset date
     query_chain = query_chain.where(["feature_threshold >= ?", model.min_threshold]) if model.min_threshold
     query_chain = query_chain.where(["feature_threshold <= ?", model.max_threshold]) if model.max_threshold
     if model.tags && model.tags.length > 0
@@ -66,7 +57,9 @@ class Photo::Operation::DateOutlineSearch < ::BaseOperation
     earliest_date = nil
     results_by_date_hash.each_pair do |d, cnt|
       earliest_date = d if earliest_date.nil? || d < earliest_date
-      results_by_date << {date: sprintf("%04d-%02d-%02d", d.year, d.month, d.day), num_items: cnt}
+      ds = d.to_s
+      date_str = "#{ds[0..3]}-#{ds[4..5]}-#{ds[6..7]}"
+      results_by_date << { date: date_str, num_items: cnt }
     end
 
     options["result_count_by_date"] = results_by_date = results_by_date.sort { |a, b| b[:date] <=> a[:date] } #reverse date sort new->old

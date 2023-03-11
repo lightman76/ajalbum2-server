@@ -11,6 +11,7 @@ module Photo::Representer
     property :description
     property :time_id
     property :time
+    property :date_bucket
     property :taken_in_tz
     property :location_latitude
     property :location_longitude
