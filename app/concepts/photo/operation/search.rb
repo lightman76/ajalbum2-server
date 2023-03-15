@@ -11,9 +11,10 @@ class Photo::Operation::Search < ::BaseOperation
   step :search!
 
   def process_paging_params(options, model:, **)
-    model.offset_date = AJUtils.parse_dashed_date_eod(model.offset_date) if model.offset_date.class == String
+    model.offset_date = AJUtils.parse_dashed_date_as_int(model.offset_date) if model.offset_date.class == String
+    model.offset_date = model.offset_date.strftime("%Y%m%d").to_i if model.offset_date.class == DateTime
     model.offset_date = model.end_date unless model.offset_date
-    model.offset_date = DateTime.now unless model.offset_date
+    model.offset_date = DateTime.now.strftime("%Y%m%d").to_i unless model.offset_date
 
     model.target_max_results = model.target_max_results.to_i if model.target_max_results && model.target_max_results.class == String
     model.target_max_results = 250 if model.target_max_results.nil? || model.target_max_results > ::Photo::Contract::Search::MAX_TARGET_MAX_RESULTS
@@ -22,10 +23,12 @@ class Photo::Operation::Search < ::BaseOperation
 
   def process_date_params(options, model:, **)
     if model.start_date
-      model.start_date = DateTime.iso8601(model.start_date)
+      # model.start_date = DateTime.iso8601(model.start_date)
+      model.start_date = AJUtils.parse_dashed_date_as_int(model.start_date)
     end
     if model.end_date
-      model.end_date = DateTime.iso8601(model.end_date)
+      # model.end_date = DateTime.iso8601(model.end_date)
+      model.end_date = AJUtils.parse_dashed_date_as_int(model.end_date)
     end
     model.timezone_offset_min = nil unless model.timezone_offset_min.class == Integer
     if model.timezone_offset_min
@@ -47,8 +50,8 @@ class Photo::Operation::Search < ::BaseOperation
     query_chain = ::Photo
     query_chain = query_chain.where(["MATCH(title, description, location_name) AGAINST (?)", model.search_text]) if model.search_text
     query_chain.where(user_id: user.id)
-    query_chain = query_chain.where(["date_bucket >= ?", model.start_date.strftime("%Y%m%d").to_i]) if model.start_date
-    query_chain = query_chain.where(["date_bucket < ?", model.offset_date.strftime("%Y%m%d").to_i]) # always use offset date
+    query_chain = query_chain.where(["date_bucket >= ?", model.start_date]) if model.start_date
+    query_chain = query_chain.where(["date_bucket <= ?", model.offset_date]) # always use offset date
     query_chain = query_chain.where(["feature_threshold >= ?", model.min_threshold]) if model.min_threshold
     query_chain = query_chain.where(["feature_threshold <= ?", model.max_threshold]) if model.max_threshold
     if model.tags && model.tags.length > 0

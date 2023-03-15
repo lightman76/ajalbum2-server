@@ -68,7 +68,7 @@ group :test do
   gem 'rspec-activemodel-mocks'
 end
 
-group :development, :test do
+group :development, :test, :localdevelopment do
   gem 'pry'
   gem 'database_cleaner'
   gem 'guard'

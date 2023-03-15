@@ -6,26 +6,31 @@ class Photo::Operation::DateOutlineSearch < ::BaseOperation
   step Contract::Validate(key: :search)
   step :sync_to_model
   step :hydrate_user
-  step :extra_sanity_checks
   step :process_date_params
+  step :extra_sanity_checks
   step :search!
 
   def extra_sanity_checks(options, model:, **)
-    model.offset_date = AJUtils.parse_dashed_date_eod(model.offset_date) if model.offset_date.class == String
+    # model.offset_date = AJUtils.parse_dashed_date_eod(model.offset_date) if model.offset_date.class == String
+    model.offset_date = AJUtils.parse_dashed_date_as_int(model.offset_date) if model.offset_date.class == String
+    model.offset_date = model.offset_date.strftime("%Y%m%d").to_i if model.offset_date.class == DateTime
     model.offset_date = model.end_date unless model.offset_date
-    model.offset_date = DateTime.now unless model.offset_date
-
+    model.offset_date = DateTime.now.strftime("%Y%m%d").to_i unless model.offset_date
     model.max_days_results = 100 if model.max_days_results.nil? || model.max_days_results > ::Photo::Contract::DateOutlineSearch::MAX_DAY_RESULTS
     true
   end
 
   def process_date_params(options, model:, **)
+    # binding.pry
     if model.start_date
-      model.start_date = DateTime.iso8601(model.start_date)
+      # model.start_date = DateTime.iso8601(model.start_date)
+      model.start_date = AJUtils.parse_dashed_date_as_int(model.start_date)
     end
     if model.end_date
-      model.end_date = DateTime.iso8601(model.end_date)
+      # model.end_date = DateTime.iso8601(model.end_date)
+      model.end_date = AJUtils.parse_dashed_date_as_int(model.end_date)
     end
+    # binding.pry
     true
   end
 
@@ -34,8 +39,8 @@ class Photo::Operation::DateOutlineSearch < ::BaseOperation
     query_chain = ::Photo.group(:date_bucket)
     query_chain.where(user_id: user.id)
     query_chain = query_chain.where(["MATCH(title, description, location_name) AGAINST (?)", model.search_text]) if model.search_text
-    query_chain = query_chain.where(["date_bucket >= ?", model.start_date.strftime("%Y%m%d").to_i]) if model.start_date
-    query_chain = query_chain.where(["date_bucket < ?", model.offset_date.strftime("%Y%m%d").to_i]) # always use offset date
+    query_chain = query_chain.where(["date_bucket >= ?", model.start_date]) if model.start_date
+    query_chain = query_chain.where(["date_bucket <= ?", model.offset_date]) # always use offset date
     query_chain = query_chain.where(["feature_threshold >= ?", model.min_threshold]) if model.min_threshold
     query_chain = query_chain.where(["feature_threshold <= ?", model.max_threshold]) if model.max_threshold
     if model.tags && model.tags.length > 0
