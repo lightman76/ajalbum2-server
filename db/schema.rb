@@ -12,11 +12,11 @@
 
 ActiveRecord::Schema.define(version: 2023_03_10_053521) do
 
-  create_table "idgentable", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "idgentable", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci", force: :cascade do |t|
     t.bigint "next_value"
   end
 
-  create_table "photo_tags", id: :bigint, default: nil, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "photo_tags", id: :bigint, default: nil, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci", force: :cascade do |t|
     t.bigint "photo_id", null: false
     t.bigint "tag_id", null: false
     t.bigint "time_id", null: false
@@ -25,7 +25,7 @@ ActiveRecord::Schema.define(version: 2023_03_10_053521) do
     t.index ["tag_id", "time_id"], name: "photo_tag_idx"
   end
 
-  create_table "photos", id: :bigint, default: nil, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "photos", id: :bigint, default: nil, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci", force: :cascade do |t|
     t.bigint "user_id", default: 0, null: false
     t.string "title", limit: 1024
     t.bigint "time_id", null: false
@@ -47,12 +47,12 @@ ActiveRecord::Schema.define(version: 2023_03_10_053521) do
     t.text "image_versions", size: :long, collation: "utf8mb4_bin"
     t.index ["date_bucket", "time"], name: "photos_date_bucket"
     t.index ["title", "description", "location_name"], name: "photos_fulltext", type: :fulltext
-    t.index ["user_id", "location_longitude", "location_latitude", "time_id", "feature_threshold"], name: "photos_loc_gis"
-    t.index ["user_id", "time", "feature_threshold"], name: "photos_time"
-    t.index ["user_id", "time_id", "feature_threshold"], name: "photos_time_id"
+    t.index ["user_id", "location_longitude", "location_latitude", "time_id", "feature_threshold"], name: "photos_loc_gis", order: { feature_threshold: :desc }
+    t.index ["user_id", "time", "feature_threshold"], name: "photos_time", order: { time: :desc, feature_threshold: :desc }
+    t.index ["user_id", "time_id", "feature_threshold"], name: "photos_time_id", order: { time_id: :desc, feature_threshold: :desc }
   end
 
-  create_table "sources", id: :bigint, default: nil, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "sources", id: :bigint, default: nil, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci", force: :cascade do |t|
     t.string "raw_name", limit: 2048, null: false
     t.string "display_name", null: false
     t.timestamp "created_at"
@@ -60,7 +60,7 @@ ActiveRecord::Schema.define(version: 2023_03_10_053521) do
     t.bigint "user_id", default: 0, null: false
   end
 
-  create_table "tags", id: :bigint, default: nil, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "tags", id: :bigint, default: nil, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci", force: :cascade do |t|
     t.bigint "user_id", default: 0, null: false
     t.string "tag_type", limit: 32, default: "tag", null: false
     t.string "name", null: false
@@ -77,7 +77,7 @@ ActiveRecord::Schema.define(version: 2023_03_10_053521) do
     t.index ["user_id", "tag_type", "name"], name: "tag_type_name"
   end
 
-  create_table "user_authentications", id: :bigint, default: nil, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "user_authentications", id: :bigint, default: nil, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.integer "auth_type", default: 0, null: false
     t.timestamp "created_at"
@@ -87,7 +87,7 @@ ActiveRecord::Schema.define(version: 2023_03_10_053521) do
     t.index ["user_id", "auth_type"], name: "user_authentications_by_user"
   end
 
-  create_table "users", id: :bigint, default: nil, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "users", id: :bigint, default: nil, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci", force: :cascade do |t|
     t.string "user_name", limit: 64, null: false
     t.timestamp "created_at"
     t.timestamp "update_at"
