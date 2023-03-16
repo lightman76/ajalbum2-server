@@ -65,7 +65,7 @@ class Photo::Operation::Search < ::BaseOperation
         tag_cnt += 1
       end
     end
-    query_chain = query_chain.order(time: :desc)
+    query_chain = query_chain.order(time_id: :desc)
     query_chain = query_chain.limit(model.target_max_results)
     options["results"] = query_chain.all.to_a
     options["next_offset_date"] = nil
