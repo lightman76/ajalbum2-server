@@ -26,6 +26,9 @@ class Photo::BulkImportJson < ::BaseOperation
       file_in = File.open(full_path_file)
       parsed_date = DateTime.iso8601(jp["taken_timestamp"])
 
+      tz_offset_parts = jp["taken_in_tz"].split(":")
+      tz_offset_min = (tz_offset_parts[0].to_i * 60) + (tz_offset_parts[1].to_i) if tz_offset_parts
+
       result = ::Photo::Operation::Create.(params: {
         photo: {
           user: user,
@@ -34,7 +37,7 @@ class Photo::BulkImportJson < ::BaseOperation
           original_content_type: jp["original_content_type"],
           time: parsed_date,
           title: jp["title"],
-          taken_in_tz: jp["taken_in_tz"],
+          taken_in_tz: tz_offset_min,
           location_latitude: jp["location_latitude"],
           location_longitude: jp["location_longitude"],
           location_name: jp["location_name"],
