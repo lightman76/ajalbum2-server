@@ -39,3 +39,7 @@ docker run --platform linux/amd64 --net ajalbum2-server_default -it --env-file .
 
 
 ./scripts/bulk_load_photos.rb -u andy /new-photos/DSC_01[456789]*.JPG
+
+
+#Mariadb access
+docker run --net ajalbum2-server_default -it --rm mariadb mariadb -h ajalbum2-server-db-1 -u ajalbum -p
