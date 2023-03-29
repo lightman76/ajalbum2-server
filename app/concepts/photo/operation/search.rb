@@ -78,7 +78,7 @@ class Photo::Operation::Search < ::BaseOperation
       if model.start_date.nil? || earliest_limit > model.start_date
         query_chain = ::Photo
         query_chain = query_chain.where(["MATCH(title, description, location_name) AGAINST (?)", model.search_text]) if model.search_text
-        query_chain = query_chain.where(["date_bucket >= ?", earliest_limit.strftime("%Y%m%d").to_i])
+        query_chain = query_chain.where(["date_bucket >= ?", earliest_limit])
         query_chain = query_chain.where(["time < ?", last_result_date])
         query_chain = query_chain.where(["feature_threshold >= ?", model.min_threshold]) if model.min_threshold
         query_chain = query_chain.where(["feature_threshold <= ?", model.max_threshold]) if model.max_threshold
