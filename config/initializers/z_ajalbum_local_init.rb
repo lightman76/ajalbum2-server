@@ -47,7 +47,10 @@ APP_CONFIG["defaults"]["timezone_offset_str"] = cur_zone_offset_str unless APP_C
 zone_offset_hour, zone_offset_min = APP_CONFIG["defaults"]["timezone_offset_str"].split(':')
 zone_offset_hour = zone_offset_hour.to_i
 zone_offset_min = zone_offset_min.to_i
-APP_CONFIG["defaults"]["timezone_offset"] = zone_offset_hour * 60 + (zone_offset_hour.abs != 0 ? (zone_offset_hour / (zone_offset_hour.abs)) * zone_offset_min : 0)
+# Automatic method - suffers from issue with daylight savings as this offset changes depending on when the server is started :(
+# APP_CONFIG["defaults"]["timezone_offset"] = zone_offset_hour * 60 + (zone_offset_hour.abs != 0 ? (zone_offset_hour / (zone_offset_hour.abs)) * zone_offset_min : 0)
+# So best just to hard code your offset and run with it.
+APP_CONFIG["defaults"]["timezone_offset"] = -360
 
 if APP_CONFIG["alternate_host1"]
   Rails.configuration.hosts << APP_CONFIG["alternate_host1"]
