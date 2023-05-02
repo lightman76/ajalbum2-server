@@ -70,7 +70,9 @@ class Photo::Operation::DateOutlineSearch < ::BaseOperation
     options["result_count_by_date"] = results_by_date = results_by_date.sort { |a, b| b[:date] <=> a[:date] } #reverse date sort new->old
 
     if earliest_date
-      options["next_offset_date"] = earliest_date - 1.day
+      early_ds = earliest_date.to_s
+      offset_date = Date.new(early_ds[0..3], early_ds[4..5], early_ds[6..7]) - 1.day
+      options["next_offset_date"] = offset_date.strftime("%Y%m%d")
     end
     #if we've gone beyond the start date, return a nil next_offset_date
     if model.start_date && options["next_offset_date"] && options["next_offset_date"] <= model.start_date
