@@ -63,7 +63,7 @@ class Photo::Operation::DateOutlineSearch < ::BaseOperation
     results_by_date_hash.each_pair do |d, cnt|
       earliest_date = d if earliest_date.nil? || d < earliest_date
       ds = d.to_s
-      date_str = "#{ds[0..3].to_i}-#{ds[4..5].to_i}-#{ds[6..7].to_i}"
+      date_str = "#{ds[0..3]}-#{ds[4..5]}-#{ds[6..7]}"
       results_by_date << { date: date_str, num_items: cnt }
     end
 
@@ -71,7 +71,7 @@ class Photo::Operation::DateOutlineSearch < ::BaseOperation
 
     if earliest_date
       early_ds = earliest_date.to_s
-      offset_date = Date.new(early_ds[0..3], early_ds[4..5], early_ds[6..7]) - 1.day
+      offset_date = Date.new(early_ds[0..3].to_i, early_ds[4..5].to_i, early_ds[6..7].to_i) - 1.day
       options["next_offset_date"] = offset_date.strftime("%Y%m%d")
     end
     #if we've gone beyond the start date, return a nil next_offset_date
