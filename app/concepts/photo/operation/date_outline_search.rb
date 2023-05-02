@@ -63,7 +63,7 @@ class Photo::Operation::DateOutlineSearch < ::BaseOperation
     results_by_date_hash.each_pair do |d, cnt|
       earliest_date = d if earliest_date.nil? || d < earliest_date
       ds = d.to_s
-      date_str = "#{ds[0..3]}-#{ds[4..5]}-#{ds[6..7]}"
+      date_str = "#{ds[0..3].to_i}-#{ds[4..5].to_i}-#{ds[6..7].to_i}"
       results_by_date << { date: date_str, num_items: cnt }
     end
 
