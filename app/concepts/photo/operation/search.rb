@@ -79,7 +79,7 @@ class Photo::Operation::Search < ::BaseOperation
         query_chain = ::Photo
         query_chain = query_chain.where(["MATCH(title, description, location_name) AGAINST (?)", model.search_text]) if model.search_text
         query_chain = query_chain.where(["date_bucket >= ?", earliest_limit])
-        query_chain = query_chain.where(["time_id < ?", last_result.time_id])
+        query_chain = query_chain.where(["photos.time_id < ?", last_result.time_id])
         query_chain = query_chain.where(["feature_threshold >= ?", model.min_threshold]) if model.min_threshold
         query_chain = query_chain.where(["feature_threshold <= ?", model.max_threshold]) if model.max_threshold
         if model.tags && model.tags.length > 0
@@ -93,7 +93,7 @@ class Photo::Operation::Search < ::BaseOperation
             tag_cnt += 1
           end
         end
-        query_chain = query_chain.order(time_id: :desc)
+        query_chain = query_chain.order("photos.time_id" => :desc)
         partial_day_results = query_chain.all.to_a
         options["results"] += partial_day_results
       end
