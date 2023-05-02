@@ -72,7 +72,7 @@ class Photo::Operation::DateOutlineSearch < ::BaseOperation
     if earliest_date
       early_ds = earliest_date.to_s
       offset_date = Date.new(early_ds[0..3].to_i, early_ds[4..5].to_i, early_ds[6..7].to_i) - 1.day
-      options["next_offset_date"] = offset_date.strftime("%Y%m%d")
+      options["next_offset_date"] = offset_date.strftime("%Y%m%d").to_i
     end
     #if we've gone beyond the start date, return a nil next_offset_date
     if model.start_date && options["next_offset_date"] && options["next_offset_date"] <= model.start_date
