@@ -12,10 +12,6 @@ class Photo::Operation::DateOutlineSearch < ::BaseOperation
 
   def extra_sanity_checks(options, model:, **)
     # model.offset_date = AJUtils.parse_dashed_date_eod(model.offset_date) if model.offset_date.class == String
-    model.offset_date = AJUtils.parse_dashed_date_as_int(model.offset_date) if model.offset_date.class == String
-    model.offset_date = model.offset_date.strftime("%Y%m%d").to_i if model.offset_date.class == DateTime
-    model.offset_date = model.end_date unless model.offset_date
-    model.offset_date = DateTime.now.strftime("%Y%m%d").to_i unless model.offset_date
     model.max_days_results = 100 if model.max_days_results.nil? || model.max_days_results > ::Photo::Contract::DateOutlineSearch::MAX_DAY_RESULTS
     true
   end
@@ -26,9 +22,18 @@ class Photo::Operation::DateOutlineSearch < ::BaseOperation
       # model.start_date = DateTime.iso8601(model.start_date)
       model.start_date = AJUtils.parse_dashed_date_as_int(model.start_date)
     end
+    if model.offset_date
+      model.offset_date = AJUtils.parse_dashed_date_as_int(model.offset_date) if model.offset_date.class == String
+      model.offset_date = model.offset_date.strftime("%Y%m%d").to_i if model.offset_date.class == DateTime
+      model.offset_date = DateTime.now.strftime("%Y%m%d").to_i unless model.offset_date
+    end
     if model.end_date
       # model.end_date = DateTime.iso8601(model.end_date)
       model.end_date = AJUtils.parse_dashed_date_as_int(model.end_date)
+      if model.end_date
+        # Now if end date is earlier than offset date, reset offset date
+        model.offset_date = model.end_date if !model.offset_date || model.end_date < model.offset_date
+      end
     end
     # binding.pry
     true
