@@ -43,3 +43,10 @@ docker run --platform linux/amd64 --net ajalbum2-server_default -it --env-file .
 
 #Mariadb access
 docker run --net ajalbum2-server_default -it --rm mariadb mariadb -h ajalbum2-server-db-1 -u ajalbum -p
+
+#Real picture import image
+docker run --platform linux/amd64 --net ajalbum2-server_default -it --env-file .env -v /home/photos/ajalbum:/new-photos -v ajalbum2-server_photo-storage:/opt/photo-storage -v $PWD:/opt/app ajalbum-server-toolbox
+Then run the following rake command
+rake import:json[andy,/new-photos/1976-1990.json,/new-photos/,true]
+
+
