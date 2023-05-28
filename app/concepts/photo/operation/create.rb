@@ -74,8 +74,8 @@ class Photo::Operation::Create < ::BaseOperation
     success = false
     while (!success) do
 
-      FileUtils.mkdir_p(File.join(PhotoUtils.originals_path, user.id.to_s, PhotoUtils.base_path_for_photo(model)))
-      full_path = File.join(PhotoUtils.originals_path, user.id.to_s, PhotoUtils.base_path_for_photo(model), PhotoUtils.file_name_for_photo(model, retry_cnt: retry_cnt))
+      FileUtils.mkdir_p(File.join(PhotoUtils.originals_path(user.id), PhotoUtils.base_path_for_photo(model)))
+      full_path = File.join(PhotoUtils.originals_path(user.id), PhotoUtils.base_path_for_photo(model), PhotoUtils.file_name_for_photo(model, retry_cnt: retry_cnt))
       if File.exists?(full_path)
         retry_cnt = retry_cnt.nil? ? 0 : (retry_cnt + 1)
       else
