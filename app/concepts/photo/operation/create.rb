@@ -74,6 +74,11 @@ class Photo::Operation::Create < ::BaseOperation
     retry_cnt = nil
     success = false
     while (!success) do
+
+      #
+      # TODO: ADD USERNAME INTO FILE PATHS!!!!!!!!!!!!!!!!!
+      #
+
       FileUtils.mkdir_p(File.join(PhotoUtils.originals_path, PhotoUtils.base_path_for_photo(model)))
       full_path = File.join(PhotoUtils.originals_path, PhotoUtils.base_path_for_photo(model), PhotoUtils.file_name_for_photo(model, retry_cnt: retry_cnt))
       if File.exists?(full_path)
@@ -324,10 +329,10 @@ class Photo::Operation::Create < ::BaseOperation
       timezone_offset_str = APP_CONFIG["defaults"]["timezone_offset_str"]
       #see if we can determine the correct zone offset based on the gps_timestamp when available
       if gps_timestamp
-        diff_hour = (x.hour - exif_time.split(":")[0].to_i) % 24
-        diff_min = ((1.0 * x.minute - exif_time.split(":")[1].to_i) / 30).round * 30
+        diff_hour = (gps_timestamp.hour - exif_time.split(":")[0].to_i) % 24
+        diff_min = ((1.0 * gps_timestamp.minute - exif_time.split(":")[1].to_i) / 30).round * 30
         if diff_min < -30 || diff_min > 30
-          diff_hour += diff_min / (diff_min.abs) #round up to the hour and account for this in the diff_hour
+          diff_hour += diff_min / (diff_min.abs) # round up to the hour and account for this in the diff_hour
           diff_min = 0
         end
         timezone_offset_str = sprintf("%3d:%2d", diff_hour, diff_min).sub(/^0/, "+")
