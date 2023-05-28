@@ -17,13 +17,13 @@ class Photo::Operation::Create < ::BaseOperation
   #   Store original as-is which would be only served for a download to print
   #
   pass :initialize_warnings
+  step :hydrate_user_param
   # Step 1: Save the original image to a temporary working dir so we can run operations on it
   step :temporary_persist_original_image
 
   #Load the image metadata
   step :load_image_metadata
 
-  step :hydrate_user_param
 
   #now handle populating other "computed" fields and merging in overrides
   step :populate_time_id
@@ -49,7 +49,6 @@ class Photo::Operation::Create < ::BaseOperation
   end
 
   def process_image(options, model:, params:, **)
-    # TODO: call operation that generates images from the original
     op_thumb = ::Photo::Operation::GenerateImages::Thumbnail.(params: { photo_model: model, autorotate: params[:photo][:autorotate] })
     unless op_thumb.success?
       Rails.logger.warn("Failed to create thumbnail: #{op_thumb.errors.details.to_json}")
@@ -197,9 +196,9 @@ class Photo::Operation::Create < ::BaseOperation
     true
   end
 
-  def temporary_persist_original_image(options, params:, **)
+  def temporary_persist_original_image(options, params:, user:, **)
     photo = params[:photo]
-    tmp_dir = PhotoUtils.temporary_upload_dir
+    tmp_dir = PhotoUtils.temporary_upload_dir(user.id)
     FileUtils.mkdir_p(tmp_dir)
     tmp_file_path = File.join(tmp_dir, "upload_#{Process.pid}_#{Time.now.to_i}.jpg")
     File.open(tmp_file_path, 'w') do |fh|

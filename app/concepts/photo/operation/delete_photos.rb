@@ -13,12 +13,12 @@ class Photo::Operation::DeletePhotos < ::BaseOperation
       begin
         photo_model = Photo.where(time_id: time_id).first
         if photo_model
-          original_file_path = File.join(PhotoUtils.originals_path, photo_model.user_id.to_s, photo_model.image_versions["original"]["relative_path"])
+          original_file_path = File.join(PhotoUtils.originals_path(photo_model.user_id), photo_model.image_versions["original"]["relative_path"])
           original_retry_cnt = photo_model.image_versions["original"]["retry_count"]
           variant_files = []
           ['fullRes', 'screenHd', 'thumb'].each do |variant_name|
             variant_relative_path = file_relative_path(photo_model, variant_name, original_retry_cnt)
-            variant_full_path = File.join(PhotoUtils.generated_images_path, photo_model.user_id.to_s, variant_relative_path)
+            variant_full_path = File.join(PhotoUtils.generated_images_path(photo_model.user_id), variant_relative_path)
             variant_files << variant_full_path
           end
 

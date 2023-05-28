@@ -8,6 +8,7 @@ module Photo::Contract
 
     property :photo_model
     property :autorotate, virtual: true
+    property :forced_rotation_degrees, virtual: true
 
     validation name: :default do
       params do

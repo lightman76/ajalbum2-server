@@ -24,9 +24,9 @@ end
 APP_CONFIG["photo_storage"] = {} unless APP_CONFIG["photo_storage"]
 APP_CONFIG["photo_storage"]["root_path"] = "/tmp/ajalbum-root" unless APP_CONFIG["photo_storage"]["root_path"]
 APP_CONFIG["photo_storage"]["tmp_upload_path"] = File.join(APP_CONFIG['photo_storage']['root_path'], 'tmp_upload') unless APP_CONFIG["photo_storage"]["tmp_upload_path"]
-APP_CONFIG["photo_storage"]["originals_path"] = File.join(APP_CONFIG["photo_storage"]["root_path"], "originals") unless APP_CONFIG["photo_storage"]["originals_path"]
-APP_CONFIG["photo_storage"]["generated_images_path"] = File.join(APP_CONFIG["photo_storage"]["root_path"], "generated") unless APP_CONFIG["photo_storage"]["generated_images_path"]
-#ensure these directories exist
+APP_CONFIG["photo_storage"]["originals_path"] = File.join(APP_CONFIG["photo_storage"]["root_path"], "@@USER_ID@@", "originals") unless APP_CONFIG["photo_storage"]["originals_path"]
+APP_CONFIG["photo_storage"]["generated_images_path"] = File.join(APP_CONFIG["photo_storage"]["root_path"], "@@USER_ID@@", "generated") unless APP_CONFIG["photo_storage"]["generated_images_path"]
+# ensure these directories exist
 FileUtils.mkdir_p(APP_CONFIG["photo_storage"]["root_path"])
 FileUtils.mkdir_p(APP_CONFIG["photo_storage"]["tmp_upload_path"])
 FileUtils.mkdir_p(APP_CONFIG["photo_storage"]["originals_path"])

@@ -10,6 +10,7 @@ class Photo::Contract::EditPhotoDetails < Reform::Form
   property :updated_description
   property :updated_timestamp #TODO: will implement in the future
   property :updated_feature_threshold
+  property :forced_rotation
 
   #List of tag IDs to add to all photos
   property :add_tags

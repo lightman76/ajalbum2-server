@@ -29,22 +29,22 @@ RSpec.describe Photo::Operation::Create do
     expect(orig["content_type"]).to eq("image/jpeg")
     expect(orig["root_store"]).to eq("originals")
     expect(orig["relative_path"]).not_to be_nil
-    expect(File.exists?(File.join(PhotoUtils.originals_path, orig["relative_path"]))).to be_truthy
+    expect(File.exists?(File.join(PhotoUtils.originals_path(@user.id), orig["relative_path"]))).to be_truthy
     thumb = m.image_versions["thumb"]
     expect(thumb).not_to be_nil
     expect(thumb["content_type"]).to eq("image/jpeg")
     expect(thumb["version"]).to eq(1)
     expect(thumb["root_store"]).to eq("generated")
     expect(thumb["relative_path"]).not_to be_nil
-    expect(File.exists?(File.join(PhotoUtils.generated_images_path, thumb["relative_path"]))).to be_truthy
+    expect(File.exists?(File.join(PhotoUtils.generated_images_path(@user.id), thumb["relative_path"]))).to be_truthy
     hd = m.image_versions["screenHd"]
     expect(hd).not_to be_nil
     expect(hd["relative_path"]).not_to be_nil
-    expect(File.exists?(File.join(PhotoUtils.generated_images_path, hd["relative_path"]))).to be_truthy
+    expect(File.exists?(File.join(PhotoUtils.generated_images_path(@user.id), hd["relative_path"]))).to be_truthy
     fr = m.image_versions["fullRes"]
     expect(fr).not_to be_nil
     expect(fr["relative_path"]).not_to be_nil
-    expect(File.exists?(File.join(PhotoUtils.generated_images_path, fr["relative_path"]))).to be_truthy
+    expect(File.exists?(File.join(PhotoUtils.generated_images_path(@user.id), fr["relative_path"]))).to be_truthy
   end
 
   context "skip generated images" do

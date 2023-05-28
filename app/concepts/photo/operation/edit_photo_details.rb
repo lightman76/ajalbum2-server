@@ -23,7 +23,7 @@ class Photo::Operation::EditPhotoDetails < ::BaseOperation
 
     add_tags = materialize_tags(model.add_tags || [], user)
     remove_tags = materialize_tags(model.remove_tags || [], user)
-
+    forced_rotation = model.forced_rotation
     added_photo_tags = []
     photo_tags_to_delete = []
 
@@ -58,6 +58,27 @@ class Photo::Operation::EditPhotoDetails < ::BaseOperation
       end
 
       photo.tags["tags"] = photo_tags
+
+      if forced_rotation
+        forced_rotation = forced_rotation.to_i if forced_rotation.class == String
+        if forced_rotation == 0 || forced_rotation == 90 || forced_rotation == 180 || forced_rotation == 270
+          op_thumb = ::Photo::Operation::GenerateImages::Thumbnail.(params: { photo_model: photo, autorotate: false, forced_rotation: forced_rotation })
+          unless op_thumb.success?
+            Rails.logger.warn("Failed to recreate rotated thumbnail: #{op_thumb.errors.details.to_json}")
+            options[:warnings] << "Failed to create thumbnail: #{op_thumb.errors.details.to_json}"
+          end
+          op_hd = ::Photo::Operation::GenerateImages::ScreenHd.(params: { photo_model: photo, autorotate: false, forced_rotation: forced_rotation })
+          unless op_hd.success?
+            Rails.logger.warn("Failed to recreate rotated ScreenHD: #{op_hd.errors.details.to_json}")
+            options[:warnings] << "Failed to create ScreenHD: #{op_hd.errors.details.to_json}"
+          end
+          op_full = ::Photo::Operation::GenerateImages::FullRes.(params: { photo_model: photo, autorotate: false, forced_rotation: forced_rotation })
+          unless op_full.success?
+            Rails.logger.warn("Failed to recreate rotated FullRes: #{op_full.errors.details.to_json}")
+            options[:warnings] << "Failed to create FullRes: #{op_full.errors.details.to_json}"
+          end
+        end
+      end
     end
     options[:added_photo_tags] = added_photo_tags
     options[:photo_tags_to_delete] = photo_tags_to_delete
