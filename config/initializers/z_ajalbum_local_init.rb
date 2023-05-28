@@ -29,8 +29,9 @@ APP_CONFIG["photo_storage"]["generated_images_path"] = File.join(APP_CONFIG["pho
 # ensure these directories exist
 FileUtils.mkdir_p(APP_CONFIG["photo_storage"]["root_path"])
 FileUtils.mkdir_p(APP_CONFIG["photo_storage"]["tmp_upload_path"])
-FileUtils.mkdir_p(APP_CONFIG["photo_storage"]["originals_path"])
-FileUtils.mkdir_p(APP_CONFIG["photo_storage"]["generated_images_path"])
+# The following are now user account specific, so don't create them here - will have to create when we create user accounts
+# FileUtils.mkdir_p(APP_CONFIG["photo_storage"]["originals_path"])
+# FileUtils.mkdir_p(APP_CONFIG["photo_storage"]["generated_images_path"])
 
 APP_CONFIG["jwt"] = {} unless APP_CONFIG["jwt"]
 APP_CONFIG["jwt"]["keys"] = {} unless APP_CONFIG["jwt"]["keys"]
