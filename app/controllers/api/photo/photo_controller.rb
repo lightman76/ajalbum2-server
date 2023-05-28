@@ -42,4 +42,17 @@ class Api::Photo::PhotoController < ApplicationController
     end
     render_api_validation_error(op, "Update failed:")
   end
+
+  def delete_photos
+    delete_params = {}
+    delete_params['authorization'] = request.headers['Authorization'] ? request.headers['Authorization'].sub("Bearer ", "") : nil
+    delete_params['user'] = params[:user]
+    delete_params['photo_time_ids'] = (params[:photo_time_ids] || "").split(',').collect { |s_id| s_id.to_i }
+    op = ::Photo::Operation::DeletePhotos.(params: delete_params)
+    if op.success?
+      render json: { delete_count: op["delete_count"] }.to_json
+      return
+    end
+    render_api_validation_error(op, "Delete failed:")
+  end
 end

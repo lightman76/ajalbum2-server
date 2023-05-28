@@ -22,5 +22,6 @@ module Photo::Representer
     property :tags, :getter => lambda { |a| tags['tags'] }
     property :feature_threshold
     property :image_versions
+    property :user_id
   end
 end

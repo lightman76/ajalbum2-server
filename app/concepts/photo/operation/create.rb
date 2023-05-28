@@ -69,18 +69,14 @@ class Photo::Operation::Create < ::BaseOperation
     true
   end
 
-  def process_original_image(options, model:, tmp_file_path:, **)
-    #first copy the tmp image to the correct subdir of the originals folder
+  def process_original_image(options, model:, user:, tmp_file_path:, **)
+    # first copy the tmp image to the correct subdir of the originals folder
     retry_cnt = nil
     success = false
     while (!success) do
 
-      #
-      # TODO: ADD USERNAME INTO FILE PATHS!!!!!!!!!!!!!!!!!
-      #
-
-      FileUtils.mkdir_p(File.join(PhotoUtils.originals_path, PhotoUtils.base_path_for_photo(model)))
-      full_path = File.join(PhotoUtils.originals_path, PhotoUtils.base_path_for_photo(model), PhotoUtils.file_name_for_photo(model, retry_cnt: retry_cnt))
+      FileUtils.mkdir_p(File.join(PhotoUtils.originals_path, user.id.to_s, PhotoUtils.base_path_for_photo(model)))
+      full_path = File.join(PhotoUtils.originals_path, user.id.to_s, PhotoUtils.base_path_for_photo(model), PhotoUtils.file_name_for_photo(model, retry_cnt: retry_cnt))
       if File.exists?(full_path)
         retry_cnt = retry_cnt.nil? ? 0 : (retry_cnt + 1)
       else

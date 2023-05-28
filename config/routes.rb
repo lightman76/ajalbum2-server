@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   post 'api/photo/date_outline_search' => 'api/photo/photo#date_outline_search'
 
   put 'api/:user/photo' => 'api/photo/photo#update_photos'
+  delete 'api/:user/photo/:photo_time_ids' => 'api/photo/photo#delete_photos'
 
   post 'api/tag/ids' => 'api/tag/tag#tags_by_id'
   post 'api/:user_name/tag' => 'api/tag/tag#create_tag'

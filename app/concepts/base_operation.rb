@@ -80,4 +80,9 @@ class BaseOperation < Trailblazer::Operation
     return strs.join(" ")
   end
 
+  def file_relative_path(photo, variant, original_retry_cnt)
+    # NOTE: we overwrite generated images but utilize the retry count of the original
+    File.join(PhotoUtils.base_path_for_photo(photo), PhotoUtils.file_name_for_photo(photo, variant: variant, retry_cnt: original_retry_cnt))
+  end
+
 end

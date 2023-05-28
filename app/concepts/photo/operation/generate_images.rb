@@ -12,10 +12,10 @@ class Photo::Operation::GenerateImages < ::BaseOperation
   def process_image(options, model:, params:, **)
     photo_model = params[:photo_model]
     autorotate = params[:autorotate]
-    original_file_path = File.join(PhotoUtils.originals_path, photo_model.image_versions["original"]["relative_path"])
+    original_file_path = File.join(PhotoUtils.originals_path, photo_model.user_id.to_s, photo_model.image_versions["original"]["relative_path"])
     original_retry_cnt = photo_model.image_versions["original"]["retry_count"]
     variant_relative_path = file_relative_path(photo_model, get_variant(), original_retry_cnt)
-    variant_full_path = File.join(PhotoUtils.generated_images_path, variant_relative_path)
+    variant_full_path = File.join(PhotoUtils.generated_images_path, photo_model.user_id.to_s, variant_relative_path)
     FileUtils.mkdir_p(File.dirname(variant_full_path))
 
     create_resized_image(original_file_path, variant_full_path, autorotate)
@@ -176,11 +176,6 @@ class Photo::Operation::GenerateImages < ::BaseOperation
       end
       true
     end
-  end
-
-  def file_relative_path(photo, variant, original_retry_cnt)
-    #NOTE: we overwrite generated images but utilize the retry count of the original
-    File.join(PhotoUtils.base_path_for_photo(photo), PhotoUtils.file_name_for_photo(photo, variant: variant, retry_cnt: original_retry_cnt))
   end
 
 end
