@@ -318,21 +318,35 @@ class Photo::Operation::Create < ::BaseOperation
   end
 
   def parse_exif_timestamp(exif_datetime, gps_timestamp = nil)
-    if exif_datetime
-      exif_date, exif_time = exif_datetime.split(" ")
-      exif_date = exif_date.gsub(":", "-")
-      timezone_offset_str = APP_CONFIG["defaults"]["timezone_offset_str"]
-      #see if we can determine the correct zone offset based on the gps_timestamp when available
-      if gps_timestamp
-        diff_hour = (gps_timestamp.hour - exif_time.split(":")[0].to_i) % 24
-        diff_min = ((1.0 * gps_timestamp.minute - exif_time.split(":")[1].to_i) / 30).round * 30
-        if diff_min < -30 || diff_min > 30
-          diff_hour += diff_min / (diff_min.abs) # round up to the hour and account for this in the diff_hour
-          diff_min = 0
+    begin
+      if exif_datetime
+        exif_date, exif_time = exif_datetime.split(" ")
+        exif_date = exif_date.gsub(":", "-")
+        timezone_offset_str = APP_CONFIG["defaults"]["timezone_offset_str"]
+        # see if we can determine the correct zone offset based on the gps_timestamp when available
+        if gps_timestamp
+          diff_hour = (gps_timestamp.hour - exif_time.split(":")[0].to_i) % 24
+          diff_min = ((1.0 * gps_timestamp.minute - exif_time.split(":")[1].to_i) / 30).round * 30
+          if diff_min < -30 || diff_min > 30
+            diff_hour += diff_min / (diff_min.abs) # round up to the hour and account for this in the diff_hour
+            diff_min = 0
+          end
+          timezone_offset_str = sprintf("%3d:%2d", diff_hour, diff_min).sub(/^0/, "+")
+          begin
+            return [DateTime.iso8601("#{exif_date}T#{exif_time}#{timezone_offset_str}"), timezone_offset_str]
+          rescue
+            # that didn't work - try resetting back to default zone
+            timezone_offset_str = APP_CONFIG["defaults"]["timezone_offset_str"]
+          end
         end
-        timezone_offset_str = sprintf("%3d:%2d", diff_hour, diff_min).sub(/^0/, "+")
+        begin
+          return [DateTime.iso8601("#{exif_date}T#{exif_time}#{timezone_offset_str}"), timezone_offset_str]
+        rescue
+          return [DateTime.iso8601("#{exif_date}T#{exif_time}#{timezone_offset_str}"), "00:00"] # fall back on UTC
+        end
       end
-      return [DateTime.iso8601("#{exif_date}T#{exif_time}#{timezone_offset_str}"), timezone_offset_str]
+    rescue
+      Rails.logger.warn("FAILED to parse date #{exif_datetime} from #{"#{exif_date}T#{exif_time}#{timezone_offset_str}"} and offset #{timezone_offset_str}")
     end
     nil
   end
