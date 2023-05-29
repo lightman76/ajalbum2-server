@@ -73,7 +73,7 @@ class Photo::Operation::Search < ::BaseOperation
     if last_result
       # now make sure we have ALL matches for this earliest day of the result set
       last_result_date_bucket = last_result.date_bucket
-      options["next_offset_date"] = last_result_date_bucket
+      options["next_offset_date"] = bucket_before(last_result_date_bucket)
       if model.start_date.nil? || last_result_date_bucket
         query_chain = ::Photo
         query_chain = query_chain.where(["MATCH(title, description, location_name) AGAINST (?)", model.search_text]) if model.search_text
@@ -94,11 +94,17 @@ class Photo::Operation::Search < ::BaseOperation
         end
         query_chain = query_chain.order("photos.time_id" => :desc)
         partial_day_results = query_chain.all.to_a
-        options["results"] += partial_day_results
+        options["results"] = options["results"] + partial_day_results
       end
     end
 
     true
   end
 
+  def bucket_before(bucket)
+    s = bucket.to_s
+    d = DateTime.new(s[0..4].to_i, s[4..6].to_i, s[6..8].to_i)
+    d = d - 1.day
+    d.strftime("%Y%m%d").to_i
+  end
 end
