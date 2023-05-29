@@ -72,13 +72,12 @@ class Photo::Operation::Search < ::BaseOperation
     last_result = options["results"].last
     if last_result
       # now make sure we have ALL matches for this earliest day of the result set
-      last_result_date = last_result.date_bucket
-      earliest_limit = last_result.date_bucket
-      options["next_offset_date"] = earliest_limit
-      if model.start_date.nil? || earliest_limit > model.start_date
+      last_result_date_bucket = last_result.date_bucket
+      options["next_offset_date"] = last_result_date_bucket
+      if model.start_date.nil? || last_result_date_bucket
         query_chain = ::Photo
         query_chain = query_chain.where(["MATCH(title, description, location_name) AGAINST (?)", model.search_text]) if model.search_text
-        query_chain = query_chain.where(["date_bucket >= ?", earliest_limit])
+        query_chain = query_chain.where(["date_bucket = ?", last_result_date_bucket])
         query_chain = query_chain.where(["photos.time_id < ?", last_result.time_id])
         query_chain = query_chain.where(["feature_threshold >= ?", model.min_threshold]) if model.min_threshold
         query_chain = query_chain.where(["feature_threshold <= ?", model.max_threshold]) if model.max_threshold

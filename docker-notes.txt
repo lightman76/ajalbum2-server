@@ -48,6 +48,7 @@ docker run --net ajalbum2-server_default -it --rm mariadb mariadb -h ajalbum2-se
 docker run --platform linux/amd64 --net ajalbum2-server_default -it --env-file .env -v /home/photos/ajalbum:/new-photos -v ajalbum2-server_photo-storage:/opt/photo-storage -v $PWD:/opt/app ajalbum-server-toolbox
 Then run the following rake command
 rake import:json[andy,/new-photos/2005-2010.json,/new-photos/,true]
+rake import:json[andy,/new-photos/2019-2020.json,/new-photos/,false]
 
 #To start server on production
 docker-compose up
