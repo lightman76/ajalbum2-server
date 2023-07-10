@@ -12,7 +12,15 @@ namespace :user do
 
   desc 'Add user'
   task :add_user, [:user_name] => :environment do |t, args|
-    raise "NOT IMPLEMENTED"
+    un = args.user_name
+    raise "Must specify user name" unless args.user_name
+    u = User.where(user_name: args.user_name).first
+    if u
+      raise "!! User with name #{args.user_name} already exists: #{u.id}"
+    end
+
+    user = User.create(user_name: args.user_name)
+    puts "  Successfully created user #{u.user_name} with id #{u.id}"
   end
 
   desc 'Set password for user'

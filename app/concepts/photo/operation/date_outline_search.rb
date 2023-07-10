@@ -42,7 +42,7 @@ class Photo::Operation::DateOutlineSearch < ::BaseOperation
   def search!(options, model:, user:, **)
     # query_chain = ::Photo.group('date(time)')
     query_chain = ::Photo.group(:date_bucket)
-    query_chain.where(user_id: user.id)
+    query_chain = query_chain.where(user_id: user.id)
     query_chain = query_chain.where(["MATCH(title, description, location_name) AGAINST (?)", model.search_text]) if model.search_text
     query_chain = query_chain.where(["date_bucket >= ?", model.start_date]) if model.start_date
     query_chain = query_chain.where(["date_bucket <= ?", model.offset_date]) # always use offset date
