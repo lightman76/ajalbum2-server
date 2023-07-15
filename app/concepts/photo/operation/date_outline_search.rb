@@ -79,8 +79,13 @@ class Photo::Operation::DateOutlineSearch < ::BaseOperation
       offset_date = Date.new(early_ds[0..3].to_i, early_ds[4..5].to_i, early_ds[6..7].to_i) - 1.day
       options["next_offset_date"] = offset_date.strftime("%Y%m%d").to_i
     end
-    #if we've gone beyond the start date, return a nil next_offset_date
+    # if we've gone beyond the start date, return a nil next_offset_date
     if model.start_date && options["next_offset_date"] && options["next_offset_date"] <= model.start_date
+      options["next_offset_date"] = nil
+    end
+
+    # if there are less results than requested, we must have found all matches, return nil next_offset_date
+    if results_by_date_hash.keys.size < model.max_days_results
       options["next_offset_date"] = nil
     end
     true
