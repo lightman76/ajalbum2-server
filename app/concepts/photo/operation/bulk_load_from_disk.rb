@@ -48,7 +48,7 @@ class Photo::Operation::BulkLoadFromDisk < ::BaseOperation
           error_count += 1
         end
       else
-        puts "Could not find file #{file} - skipping"
+        puts "Could not find file #{file_path} - skipping"
         error_count += 1
       end
     end
