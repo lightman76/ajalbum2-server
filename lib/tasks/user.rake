@@ -19,7 +19,7 @@ namespace :user do
       raise "!! User with name #{args.user_name} already exists: #{u.id}"
     end
 
-    user = User.create(user_name: args.user_name)
+    u = User.create(user_name: args.user_name)
     puts "  Successfully created user #{u.user_name} with id #{u.id}"
   end
 
