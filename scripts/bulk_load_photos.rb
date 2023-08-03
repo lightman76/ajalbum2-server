@@ -80,7 +80,7 @@ class BulkLoadPhotos
     def album_option(parser)
       parser.on("-a", "--album ALBUM",
                 "Tag all photos with album tag ALBUM") do |album_tag|
-        self.album_tags << album_tag
+        self.albums << album_tag
       end
     end
 
