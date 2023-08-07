@@ -76,6 +76,7 @@ class Photo::Operation::Search < ::BaseOperation
       options["next_offset_date"] = bucket_before(last_result_date_bucket)
       if model.start_date.nil? || last_result_date_bucket
         query_chain = ::Photo
+        query_chain = query_chain.where(user_id: user.id)
         query_chain = query_chain.where(["MATCH(title, description, location_name) AGAINST (?)", model.search_text]) if model.search_text
         query_chain = query_chain.where(["date_bucket = ?", last_result_date_bucket])
         query_chain = query_chain.where(["photos.time_id < ?", last_result.time_id])
