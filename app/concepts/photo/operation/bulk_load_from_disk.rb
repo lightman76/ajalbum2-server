@@ -13,38 +13,44 @@ class Photo::Operation::BulkLoadFromDisk < ::BaseOperation
 
     model.file_list.each do |file_path|
       if File.exists?(file_path)
-        file_in = File.open(file_path)
+        begin
+          file_in = File.open(file_path)
 
-        content_type = "image/jpeg"
-        content_type = "image/png" if /.png$/i.match(file_path)
-        #TODO: Add other types as needed
+          content_type = "image/jpeg"
+          content_type = "image/png" if /.png$/i.match(file_path)
+          # TODO: Add other types as needed
 
-        puts "  Processing #{file_path} at #{DateTime.now} - autorotate=#{model.autorotate}"
-        op = ::Photo::Operation::Create.(params: {
-          photo: {
-            user: user,
-            image_stream: file_in,
-            original_file_name: File.basename(file_path),
-            original_content_type: content_type,
-            title: File.basename(file_path),
-            tag_names: model.general_tags,
-            tag_events: model.event_tags,
-            tag_locations: model.location_tags,
-            tag_albums: model.album_tags,
-            feature_threshold: model.feature_threshold,
-            autorotate: model.autorotate
-          }
-        })
+          puts "  Processing #{file_path} at #{DateTime.now} - autorotate=#{model.autorotate}"
+          op = ::Photo::Operation::Create.(params: {
+            photo: {
+              user: user,
+              image_stream: file_in,
+              original_file_name: File.basename(file_path),
+              original_content_type: content_type,
+              title: File.basename(file_path),
+              tag_names: model.general_tags,
+              tag_events: model.event_tags,
+              tag_locations: model.location_tags,
+              tag_albums: model.album_tags,
+              feature_threshold: model.feature_threshold,
+              autorotate: model.autorotate
+            }
+          })
 
-        if op.success?
-          success_count += 1
-          if op[:warnings] && op[:warnings].length > 0
-            puts "    Errors while importing #{file_path}: #{op[:warnings].to_json}"
+          if op.success?
+            success_count += 1
+            if op[:warnings] && op[:warnings].length > 0
+              puts "    Errors while importing #{file_path}: #{op[:warnings].to_json}"
+            else
+              puts "    Successfully imported #{file_path}"
+            end
           else
-            puts "    Successfully imported #{file_path}"
+            puts "  !!Failed to import #{file_path} #{::BaseOperation.human_string_from_op_errors(op)}"
+            error_count += 1
           end
-        else
-          puts "  !!Failed to import #{file_path} #{human_string_from_op_errors(op)}"
+        rescue StandardError => e
+          puts "Could not find file #{file_path} - skipping: #{e.message}"
+          puts "  !!Failed to import #{file_path} #{::BaseOperation.human_string_from_op_errors(op)}"
           error_count += 1
         end
       else
