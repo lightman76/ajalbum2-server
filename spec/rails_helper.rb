@@ -67,8 +67,8 @@ end
 APP_CONFIG["defaults"]["timezone_offset"] = -5 * 60
 APP_CONFIG["photo_storage"]["root_path"] = File.join(Rails.root, "tmp", "test_file_root")
 APP_CONFIG["photo_storage"]["tmp_upload_path"] = File.join(APP_CONFIG['photo_storage']['root_path'], 'tmp_upload')
-APP_CONFIG["photo_storage"]["originals_path"] = File.join(APP_CONFIG["photo_storage"]["root_path"], "originals")
-APP_CONFIG["photo_storage"]["generated_images_path"] = File.join(APP_CONFIG["photo_storage"]["root_path"], "generated")
+APP_CONFIG["photo_storage"]["originals_path"] = File.join(APP_CONFIG["photo_storage"]["root_path"], "@@USER_ID@@", "originals")
+APP_CONFIG["photo_storage"]["generated_images_path"] = File.join(APP_CONFIG["photo_storage"]["root_path"], "@@USER_ID@@", "generated")
 
 FileUtils.mkdir_p(APP_CONFIG["photo_storage"]["root_path"])
 FileUtils.mkdir_p(APP_CONFIG["photo_storage"]["tmp_upload_path"])
@@ -77,7 +77,7 @@ FileUtils.mkdir_p(APP_CONFIG["photo_storage"]["generated_images_path"])
 
 def cleanup_test_photos
   if APP_CONFIG["photo_storage"]["root_path"].index('test_file_root')
-    #ok - looks good - this is still the test path
+    # ok - looks good - this is still the test path
     # Clean up any test files that where created
     FileUtils.rm_rf(APP_CONFIG["photo_storage"]["root_path"])
     #recreate the base directories
