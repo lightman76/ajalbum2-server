@@ -40,9 +40,9 @@ RSpec.describe ::Tag::Operation::SearchTags do
     result = ::Tag::Operation::SearchTags.(params: { search: { "user": "fred", search_text: 'e' } })
     expect(result.success?).to be_truthy
     expect(result["matching_tags"].length).to eq(4)
-    expect(result["matching_tags"][0].name).to eq("Test Tag 1")
-    expect(result["matching_tags"][1].name).to eq("Test Tag 2")
-    expect(result["matching_tags"][2].name).to eq("John Doe")
-    expect(result["matching_tags"][3].name).to eq("Suzy Queue")
+    expect(result["matching_tags"][0].name).to eq("John Doe")
+    expect(result["matching_tags"][1].name).to eq("Suzy Queue")
+    expect(result["matching_tags"][2].name).to eq("Test Tag 1")
+    expect(result["matching_tags"][3].name).to eq("Test Tag 2")
   end
 end

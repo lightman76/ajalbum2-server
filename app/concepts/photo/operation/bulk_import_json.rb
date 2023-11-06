@@ -1,6 +1,6 @@
 require_relative "../contract/bulk_import_json"
 
-class Photo::BulkImportJson < ::BaseOperation
+class Photo::Operation::BulkImportJson < ::BaseOperation
   step Model(OpenStruct, :new)
   step Contract::Build(constant: ::Photo::Contract::BulkImportJson)
   step Contract::Validate()
@@ -26,6 +26,7 @@ class Photo::BulkImportJson < ::BaseOperation
       file_in = File.open(full_path_file)
       parsed_date = DateTime.iso8601(jp["taken_timestamp"])
 
+      jp["taken_in_tz"] = "-05:00" unless jp["taken_in_tz"]
       tz_offset_parts = jp["taken_in_tz"].split(":")
       tz_offset_min = (tz_offset_parts[0].to_i * 60) + (tz_offset_parts[1].to_i) if tz_offset_parts
 

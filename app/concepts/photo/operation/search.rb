@@ -104,7 +104,7 @@ class Photo::Operation::Search < ::BaseOperation
 
   def bucket_before(bucket)
     s = bucket.to_s
-    d = DateTime.new(s[0..4].to_i, s[4..6].to_i, s[6..8].to_i)
+    d = DateTime.new(s[0...4].to_i, s[4...6].to_i, s[6...8].to_i)
     d = d - 1.day
     d.strftime("%Y%m%d").to_i
   rescue StandardError => e

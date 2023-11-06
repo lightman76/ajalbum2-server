@@ -79,7 +79,7 @@ RSpec.describe ::Photo::Operation::DateOutlineSearch do
     end
 
     it "should return correct results for no filter" do
-      result = ::Photo::Operation::DateOutlineSearch.(params: { search: { timezone_offset_min: -5 * 60, user: 'George' } })
+      result = ::Photo::Operation::DateOutlineSearch.(params: { search: { timezone_offset_min: -5 * 60, user: 'George', offset_date: date_str(Time.now) } })
       expect(result.success?).to be_truthy
       results_by_date = result["result_count_by_date"]
       expect(results_by_date).not_to be_nil
@@ -112,7 +112,7 @@ RSpec.describe ::Photo::Operation::DateOutlineSearch do
                           user: @user
       )
 
-      result = ::Photo::Operation::DateOutlineSearch.(params: { search: { timezone_offset_min: -5 * 60, user: 'George' } })
+      result = ::Photo::Operation::DateOutlineSearch.(params: { search: { timezone_offset_min: -5 * 60, user: 'George', offset_date: date_str(Time.now) } })
       expect(result.success?).to be_truthy
       results_by_date = result["result_count_by_date"]
       expect(results_by_date).not_to be_nil
@@ -129,3 +129,4 @@ RSpec.describe ::Photo::Operation::DateOutlineSearch do
     end
   end
 end
+#

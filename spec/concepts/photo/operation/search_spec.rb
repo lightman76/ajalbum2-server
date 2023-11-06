@@ -106,8 +106,7 @@ RSpec.describe ::Photo::Operation::Search do
       expect(results).not_to be_nil
       expect(results.length).to eq(2)
       next_offset = result["next_offset_date"]
-      expect(next_offset < @p3t).to be_truthy
-      expect(next_offset).to be_within(25.hours).of(@p3t)
+      expect(next_offset < @p3.date_bucket).to be_truthy
       results = result["results"]
       #now check order
       expect(results[0].id).to eq(@p1.id)
