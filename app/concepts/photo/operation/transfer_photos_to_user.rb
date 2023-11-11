@@ -23,7 +23,7 @@ class Photo::Operation::TransferPhotosToUser < ::BaseOperation
         to_tag = tag_mapping[tid]
         unless to_tag
           from_tag = Tag.get(tid)
-          to_tag = Tag.where(user_id: to_user.id, tag_type: from_tag.type, name: from_tag.name).first
+          to_tag = Tag.where(user_id: to_user.id, tag_type: from_tag.tag_type, name: from_tag.name).first
           if to_tag
             tag_mapping[tid] = to_tag
           else
