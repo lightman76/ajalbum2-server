@@ -13,6 +13,7 @@ class Photo::Operation::TransferPhotosToUser < ::BaseOperation
   step :move_photos
 
   def move_photos(options, user:, to_user:, photos:, **)
+    transfer_count = 0
     tag_mapping = {}
     source_mapping = {}
     photos.each do |photo|
@@ -71,9 +72,9 @@ class Photo::Operation::TransferPhotosToUser < ::BaseOperation
       end
 
       photo.save!
-
+      transfer_count += 1
     end
-
+    options[:transfer_count] = transfer_count
     true
   end
 

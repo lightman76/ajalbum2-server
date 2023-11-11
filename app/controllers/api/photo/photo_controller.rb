@@ -43,6 +43,18 @@ class Api::Photo::PhotoController < ApplicationController
     render_api_validation_error(op, "Update failed:")
   end
 
+  def transfer_photos_to_user
+    transfer_params = JSON.parse(request.body.read)
+    transfer_params['authorization'] = request.headers['Authorization'] ? request.headers['Authorization'].sub("Bearer ", "") : nil
+    transfer_params['user'] = params[:user]
+    op = ::Photo::Operation::TransferPhotosToUser.(params: transfer_params)
+    if op.success?
+      render json: { transfer_count: op["transfer_count"] }.to_json
+      return
+    end
+    render_api_validation_error(op, "Transfer failed:")
+  end
+
   def delete_photos
     delete_params = {}
     delete_params['authorization'] = request.headers['Authorization'] ? request.headers['Authorization'].sub("Bearer ", "") : nil

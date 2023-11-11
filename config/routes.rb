@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   get 'api/photo/date_outline_search' => 'api/photo/photo#date_outline_search'
   post 'api/photo/date_outline_search' => 'api/photo/photo#date_outline_search'
 
+  post 'api/:user/photo/transfer' => 'api/photo/photo#transfer_photos_to_user'
   put 'api/:user/photo' => 'api/photo/photo#update_photos'
   delete 'api/:user/photo/:photo_time_ids' => 'api/photo/photo#delete_photos'
 
