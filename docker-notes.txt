@@ -51,5 +51,7 @@ rake import:json[andy,/new-photos/2005-2010.json,/new-photos/,true]
 rake import:json[andy,/new-photos/2019-2020.json,/new-photos/,false]
 
 #To start server on production
-docker-compose up
+docker compose up
+OR
+docker compose up --build   #to rebuild and pick up changes
 
