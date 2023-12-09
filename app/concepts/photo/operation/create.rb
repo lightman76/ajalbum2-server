@@ -70,7 +70,12 @@ class Photo::Operation::Create < ::BaseOperation
     end
 
     if params[:photo][:processing_pool]
-      future = ::Concurrent::Future.execute(:executor => params[:photo][:processing_pool]) do
+      pool = params[:photo][:processing_pool]
+      # wait for a slot in the threadpool
+      while pool.max_queue && pool.max_queue <= pool.queue_length do
+        sleep 0.25
+      end
+      future = ::Concurrent::Future.execute(:executor => pool) do
         processing_img.call
       end
       options[:processing_future] = future

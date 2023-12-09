@@ -11,7 +11,7 @@ class Photo::Operation::BulkLoadFromDisk < ::BaseOperation
     error_count = 0
     success_count = 0
 
-    processing_pool = ::Concurrent::FixedThreadPool.new(APP_CONFIG["processing_concurrency"] || 6, auto_terminate: false, name: "Image Processing")
+    processing_pool = ::Concurrent::FixedThreadPool.new(APP_CONFIG["processing_concurrency"] || 6, auto_terminate: false, name: "Image Processing", max_queue: 10)
     futures = []
 
     model.file_list.each do |file_path|
