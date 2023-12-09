@@ -26,6 +26,7 @@ gem 'roar'
 gem 'multi_json'
 gem 'mimemagic','~>0.3.9'
 gem 'jwt'
+gem 'concurrent-ruby', '~>1.2.2'
 
 #Gem to read EXIF (aka jpeg) metadata - IMPORTANT: Requires libexif/libexif-devel to be installed locally
 gem 'exif', "~>2.2.0"

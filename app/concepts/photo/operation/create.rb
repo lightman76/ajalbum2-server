@@ -49,22 +49,39 @@ class Photo::Operation::Create < ::BaseOperation
   end
 
   def process_image(options, model:, params:, **)
-    op_thumb = ::Photo::Operation::GenerateImages::Thumbnail.(params: { photo_model: model, autorotate: params[:photo][:autorotate] })
-    unless op_thumb.success?
-      Rails.logger.warn("Failed to create thumbnail: #{op_thumb.errors.details.to_json}")
-      options[:warnings] << "Failed to create thumbnail: #{op_thumb.errors.details.to_json}"
+    processing_img = lambda do
+      model2 = ::Photo.get(model.id)
+      op_thumb = ::Photo::Operation::GenerateImages::Thumbnail.(params: { photo_model: model2, autorotate: params[:photo][:autorotate] })
+      unless op_thumb.success?
+        Rails.logger.warn("Failed to create thumbnail: #{op_thumb.errors.details.to_json}")
+        options[:warnings] << "Failed to create thumbnail: #{op_thumb.errors.details.to_json}"
+      end
+      op_hd = ::Photo::Operation::GenerateImages::ScreenHd.(params: { photo_model: model2, autorotate: params[:photo][:autorotate] })
+      unless op_hd.success?
+        Rails.logger.warn("Failed to create ScreenHD: #{op_hd.errors.details.to_json}")
+        options[:warnings] << "Failed to create ScreenHD: #{op_hd.errors.details.to_json}"
+      end
+      op_full = ::Photo::Operation::GenerateImages::FullRes.(params: { photo_model: model2, autorotate: params[:photo][:autorotate] })
+      unless op_full.success?
+        Rails.logger.warn("Failed to create FullRes: #{op_full.errors.details.to_json}")
+        options[:warnings] << "Failed to create FullRes: #{op_full.errors.details.to_json}"
+      end
+      model2.save!
     end
-    op_hd = ::Photo::Operation::GenerateImages::ScreenHd.(params: { photo_model: model, autorotate: params[:photo][:autorotate] })
-    unless op_hd.success?
-      Rails.logger.warn("Failed to create ScreenHD: #{op_hd.errors.details.to_json}")
-      options[:warnings] << "Failed to create ScreenHD: #{op_hd.errors.details.to_json}"
+
+    if params[:photo][:processing_pool]
+      pool = params[:photo][:processing_pool]
+      # wait for a slot in the threadpool
+      while pool.max_queue && pool.max_queue <= pool.queue_length do
+        sleep 0.25
+      end
+      future = ::Concurrent::Future.execute(:executor => pool) do
+        processing_img.call
+      end
+      options[:processing_future] = future
+    else
+      processing_img.call
     end
-    op_full = ::Photo::Operation::GenerateImages::FullRes.(params: { photo_model: model, autorotate: params[:photo][:autorotate] })
-    unless op_full.success?
-      Rails.logger.warn("Failed to create FullRes: #{op_full.errors.details.to_json}")
-      options[:warnings] << "Failed to create FullRes: #{op_full.errors.details.to_json}"
-    end
-    model.save!
     true
   end
 
@@ -97,8 +114,8 @@ class Photo::Operation::Create < ::BaseOperation
     options[:original_retry_cnt] = retry_cnt
     if retry_cnt
       model.time_id = model.time_id + (retry_cnt + 1) # this should be in milliseconds
-      model.save!
     end
+    model.save!
     true
   end
 
@@ -420,7 +437,7 @@ class Photo::Operation::Create < ::BaseOperation
   end
 
   def debug(options, params:, **)
-    binding.pry
+    # binding.pry
     true
   end
 

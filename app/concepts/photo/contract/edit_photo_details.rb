@@ -8,15 +8,17 @@ class Photo::Contract::EditPhotoDetails < Reform::Form
   #The following fields will be updated if present and not null
   property :updated_title
   property :updated_description
-  property :updated_timestamp #TODO: will implement in the future
+  property :updated_timestamp # TODO: will implement in the future
   property :updated_feature_threshold
   property :forced_rotation
 
-  #List of tag IDs to add to all photos
+  # List of tag IDs to add to all photos
   property :add_tags
 
-  #List of tag IDs to remove from all photos (if present)
+  # List of tag IDs to remove from all photos (if present)
   property :remove_tags
+
+  property :processing_pool, virtual: true
 
   validation name: :default do
     params do

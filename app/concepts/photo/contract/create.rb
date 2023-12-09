@@ -26,6 +26,7 @@ module Photo::Contract
     property :feature_threshold, virtual: true #discriminator to filter out lower value pictures, archive, etc.  Default to 0, negative means probably shouldn't show, positive good to great picture, highlight
     property :autorotate, virtual: true #should we auto-rotate the image based on the metadata or leave orientation as is.  Old version appears to have rotated the original images but not updated the metadata to reflect this rotation causing them to be "double rotated"
 
+    property :processing_pool, virtual: true
     validation name: :default do
       params do
         required(:image_stream).filled

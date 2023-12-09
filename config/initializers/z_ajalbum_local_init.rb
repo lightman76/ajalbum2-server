@@ -38,6 +38,10 @@ APP_CONFIG["jwt"]["keys"] = {} unless APP_CONFIG["jwt"]["keys"]
 # https://stackoverflow.com/questions/33960565/how-to-generate-a-hs512-secret-key-to-use-with-jwt
 APP_CONFIG["jwt"]["keys"]["auth-hmac512"] = 'xy8qOZJe/F+/t8CjnoNQqbnSADWMG3+RbuO8nPhT6NmBlafjiZVyp61Ij3WCM5tR1jj4/NcA6f4EMcrgVnP9WZ+htKikNxLkR7CyN6Ie+df2uV1CgbVpsXaAKJWK64kGqdAwBxR/oqYXoXLQ7fI2hWoUkCrH7qjFRj6ZMcyB//gTmogCMrZ+3EIiOc3C3QsdcjbGyG0saNTlZppM1DJbX+1wZyknBGOSploNHg==' unless APP_CONFIG["jwt"]["keys"]["auth-hmac512"]
 
+# How many threads do we want to process images concurrently.  Probably want to do close to the number of processor threads, though with IO overhead, maybe able to do more?
+# NOTE: make sure the database has a pool size larger than this number or else threads won't be able to get a connection
+APP_CONFIG["processing_concurrency"] = 10
+
 APP_CONFIG["defaults"] = {} unless APP_CONFIG["defaults"]
 # default to the current timezone.  For normal cameras, we probably set its to our local timezone.
 # For phone cameras, they'll probably update timezones according to their location, but should also
