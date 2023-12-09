@@ -62,21 +62,32 @@ class Photo::Operation::EditPhotoDetails < ::BaseOperation
       if forced_rotation
         forced_rotation = forced_rotation.to_i if forced_rotation.class == String
         if forced_rotation == 0 || forced_rotation == 90 || forced_rotation == 180 || forced_rotation == 270
-          op_thumb = ::Photo::Operation::GenerateImages::Thumbnail.(params: { photo_model: photo, autorotate: false, forced_rotation: forced_rotation })
-          unless op_thumb.success?
-            Rails.logger.warn("Failed to recreate rotated thumbnail: #{op_thumb.errors.details.to_json}")
-            options[:warnings] << "Failed to create thumbnail: #{op_thumb.errors.details.to_json}"
+          processing_img = lambda do
+            op_thumb = ::Photo::Operation::GenerateImages::Thumbnail.(params: { photo_model: photo, autorotate: false, forced_rotation: forced_rotation })
+            unless op_thumb.success?
+              Rails.logger.warn("Failed to recreate rotated thumbnail: #{op_thumb.errors.details.to_json}")
+              options[:warnings] << "Failed to create thumbnail: #{op_thumb.errors.details.to_json}"
+            end
+            op_hd = ::Photo::Operation::GenerateImages::ScreenHd.(params: { photo_model: photo, autorotate: false, forced_rotation: forced_rotation })
+            unless op_hd.success?
+              Rails.logger.warn("Failed to recreate rotated ScreenHD: #{op_hd.errors.details.to_json}")
+              options[:warnings] << "Failed to create ScreenHD: #{op_hd.errors.details.to_json}"
+            end
+            op_full = ::Photo::Operation::GenerateImages::FullRes.(params: { photo_model: photo, autorotate: false, forced_rotation: forced_rotation })
+            unless op_full.success?
+              Rails.logger.warn("Failed to recreate rotated FullRes: #{op_full.errors.details.to_json}")
+              options[:warnings] << "Failed to create FullRes: #{op_full.errors.details.to_json}"
+            end
           end
-          op_hd = ::Photo::Operation::GenerateImages::ScreenHd.(params: { photo_model: photo, autorotate: false, forced_rotation: forced_rotation })
-          unless op_hd.success?
-            Rails.logger.warn("Failed to recreate rotated ScreenHD: #{op_hd.errors.details.to_json}")
-            options[:warnings] << "Failed to create ScreenHD: #{op_hd.errors.details.to_json}"
+          if params[:processing_pool]
+            future = ::Concurrent::Future.execute(:executor => params[:processing_pool]) do
+              processing_img.call
+            end
+            options[:processing_future] = future
+          else
+            processing_img.call
           end
-          op_full = ::Photo::Operation::GenerateImages::FullRes.(params: { photo_model: photo, autorotate: false, forced_rotation: forced_rotation })
-          unless op_full.success?
-            Rails.logger.warn("Failed to recreate rotated FullRes: #{op_full.errors.details.to_json}")
-            options[:warnings] << "Failed to create FullRes: #{op_full.errors.details.to_json}"
-          end
+
         end
       end
     end

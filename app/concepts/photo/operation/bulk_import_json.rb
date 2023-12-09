@@ -19,6 +19,10 @@ class Photo::Operation::BulkImportJson < ::BaseOperation
   end
 
   def process_json(options, json_data:, user:, **)
+
+    processing_pool = ::Concurrent::FixedThreadPool.new(APP_CONFIG["processing_concurrency"] || 6, auto_terminate: false, name: "Image Processing")
+    futures = []
+
     json_data["photos"].each do |jp|
       from_orig_location = jp["from_original_file_path"]
       full_path_file = File.join(options[:import_photo_root], from_orig_location)
@@ -50,10 +54,12 @@ class Photo::Operation::BulkImportJson < ::BaseOperation
           tag_locations: jp["tag_locations"],
           tag_albums: jp["tag_albums"],
           feature_threshold: jp["feature_threshold"],
-          autorotate: !options[:skip_autorotate]
+          autorotate: !options[:skip_autorotate],
+          processing_pool: processing_pool,
         }
       })
       if result.success?
+        futures << op[:processing_future]
         options[:success_count] += 1
         puts "   Successfully imported #{parsed_date.to_s} - #{jp["title"]}"
       else
@@ -66,6 +72,20 @@ class Photo::Operation::BulkImportJson < ::BaseOperation
     ensure
       file_in.close if file_in
     end
+    puts "\n\nWaiting for image processing to complete..."
+    is_complete = false
+    while !is_complete do
+      status = futures.inject({ failed: 0, success: 0, pending: 0 }) do |c, v|
+        key = v.complete? ? (v.rejected? ? :failed : :success) : :pending
+        c[key] = c[key] + 1
+        c
+      end
+      is_complete = status[:pending] == 0
+      puts "  #{status[:pending]} pending; #{status[:success]} completed; #{status[:failed]} errors"
+      sleep(3) unless is_complete
+    end
+    processing_pool.shutdown
+
     puts "\n\nImport complete: Successful imports: #{options[:success_count]}, Failed imports: #{options[:failure_count]}\n\n\n"
     true
   end

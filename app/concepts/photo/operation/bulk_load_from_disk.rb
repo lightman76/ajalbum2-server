@@ -11,6 +11,9 @@ class Photo::Operation::BulkLoadFromDisk < ::BaseOperation
     error_count = 0
     success_count = 0
 
+    processing_pool = ::Concurrent::FixedThreadPool.new(APP_CONFIG["processing_concurrency"] || 6, auto_terminate: false, name: "Image Processing")
+    futures = []
+
     model.file_list.each do |file_path|
       if File.exists?(file_path)
         begin
@@ -33,17 +36,41 @@ class Photo::Operation::BulkLoadFromDisk < ::BaseOperation
               tag_locations: model.location_tags,
               tag_albums: model.album_tags,
               feature_threshold: model.feature_threshold,
-              autorotate: model.autorotate
+              autorotate: model.autorotate,
+              processing_pool: processing_pool,
             }
           })
 
           if op.success?
-            success_count += 1
-            if op[:warnings] && op[:warnings].length > 0
-              puts "    Errors while importing #{file_path}: #{op[:warnings].to_json}"
-            else
-              puts "    Successfully imported #{file_path}"
+            future = op[:processing_future]
+            futures << future
+            obs = Object.new
+
+            def obs.path(path)
+              @path = path
             end
+
+            def obs.op(path)
+              @op = op
+            end
+
+            def obs.update(time, value, reason)
+              puts "Observer called with #{time}; #{value}; #{reason}"
+              if value
+                if @op[:warnings] && @op[:warnings].length > 0
+                  puts "    Errors while importing #{@path}: #{@op[:warnings].to_json}"
+                else
+                  puts "    Successfully imported #{@path}"
+                end
+              else
+                puts "  !!Failed to import #{@path};; #{reason} ;; #{::BaseOperation.human_string_from_op_errors(@op)}"
+              end
+            end
+
+            future.add_observer(obs)
+
+            puts "    Successfully started processing #{file_path}"
+            success_count += 1
           else
             puts "  !!Failed to import #{file_path} #{::BaseOperation.human_string_from_op_errors(op)}"
             error_count += 1
@@ -58,6 +85,20 @@ class Photo::Operation::BulkLoadFromDisk < ::BaseOperation
         error_count += 1
       end
     end
+    puts "\n\nWaiting for image processing to complete..."
+    is_complete = false
+    while !is_complete do
+      status = futures.inject({ failed: 0, success: 0, pending: 0 }) do |c, v|
+        key = v.complete? ? (v.rejected? ? :failed : :success) : :pending
+        c[key] = c[key] + 1
+        c
+      end
+      is_complete = status[:pending] == 0
+      puts "  #{status[:pending]} pending; #{status[:success]} completed; #{status[:failed]} errors"
+      sleep(3) unless is_complete
+    end
+    processing_pool.shutdown
+
     options[:success_count] = success_count
     options[:error_count] = error_count
     puts "\nProcessing completed: #{error_count} errors and #{success_count} successes."
