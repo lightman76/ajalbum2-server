@@ -16,7 +16,7 @@ docker build --platform linux/amd64 -t ajalbum-server -f Dockerfile.rails-server
 
 #run it docker run --platform linux/amd64 -it --env-file .env -p 8010:8010 -v $PWD:/opt/app ajalbum-server
 
-
+#scripts/bulk_load_photos.rb -u andy-birds /new-photos/20220915-Birds/*.JPG
 
 
 To access the docker managed volumes
