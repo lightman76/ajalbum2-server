@@ -73,9 +73,13 @@ class BaseOperation < Trailblazer::Operation
 
   def self.human_string_from_op_errors(op)
     strs = []
-    details = op['contract.default'].errors.details
-    details.each_key do |k|
-      strs << "#{k}: #{details[k].collect { |e| e[:error] }.join(" ")}; "
+    if op['contract.default']&.errors&.details
+      details = op['contract.default'].errors.details
+      details.each_key do |k|
+        strs << "#{k}: #{details[k].collect { |e| e[:error] }.join(" ")}; "
+      end
+    else
+      strs << "Unknown error occurred"
     end
     return strs.join(" ")
   end

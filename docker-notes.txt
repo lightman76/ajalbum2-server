@@ -6,6 +6,12 @@ docker build --platform linux/amd64 -t ajalbum-rails-imagemagick -f Dockerfile.r
 
 #Now add our gem dependencies
 docker build --platform linux/amd64 -t ajalbum-server-deps -f Dockerfile.railsdeps .
+#For the server, push it to the local repository
+#first tag
+docker tag ajalbum-server-deps:latest localhost:5000/ajalbum-server-deps:latest
+#Now push
+docker push localhost:5000/ajalbum-server-deps:latest
+
 
 #Build a toolbox environment to access the docker version of rails
 docker build --platform linux/amd64 -t ajalbum-server-toolbox -f Dockerfile.rails-toolbox .
