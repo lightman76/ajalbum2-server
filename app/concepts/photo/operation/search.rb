@@ -13,7 +13,7 @@ class Photo::Operation::Search < ::BaseOperation
   def process_paging_params(options, model:, **)
     model.offset_date = AJUtils.parse_dashed_date_as_int(model.offset_date) if model.offset_date.class == String
     model.offset_date = model.offset_date.strftime("%Y%m%d").to_i if model.offset_date.class == DateTime
-    model.offset_date = model.end_date unless model.offset_date
+    model.offset_date = model.end_date if model.end_date && (!model.offset_date || model.offset_date > model.end_date)
     model.offset_date = DateTime.now.strftime("%Y%m%d").to_i unless model.offset_date
 
     model.target_max_results = model.target_max_results.to_i if model.target_max_results && model.target_max_results.class == String
